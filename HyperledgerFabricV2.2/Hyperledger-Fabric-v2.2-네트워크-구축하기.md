@@ -17,6 +17,7 @@
 > Hyperledger Fabric v2.2를 알아보자.<br>
 > Linux 환경이 갖춰져 있다면 5분만에 블록체인 네트워크를 활성화 시킬 수 있다!!😆<br>
 > 본 문서는 Linux환경에서 docker를 적극 활용한다.
+
 - |OS|Memory|Disk|
   |:-:|:-:|:-:|
   |Ubuntu 18.04|2048MB|20GB|
@@ -24,7 +25,7 @@
 ## 1. 사전 준비
 > Hyperledger Fabric의 블록체인 네트워크는 docker container를 활용하여 편리한
 > 운영 관리가 가능하다.
-> 또한 Fabric core는 Github에 오픈소스로 공개되어 있다.<br>
+> 또한 Fabric core는 Github에 오픈소스로 공개되어 있다.
 > 자신의 OS에 git과 docker, docker-compose를 설치하여 사전 준비를 완료하자.
 
 - Git 설치하기
@@ -75,6 +76,7 @@
 ## 3. 테스트 네트워크 구축하기
 > Hyperledger Fabric은 잘 만들어진 Shell script를 제공한다.<br>
 > 이를 이용하여 채널 생성, 체인코드 배포 등을 누구나 쉽게 할 수 있다.<br>
+
 ### 3-1. 네트워크 시작
 ```sh
 cd fabric-samples/test-network
@@ -126,7 +128,7 @@ docker ps -a
   # 다음이 나오면 성공
   # -> INFO 001 Chaincode invoke successful. result: status:200
   ```
-  - 배포한 체인코드를 실행하여 블록체인에 write한다. <br>
+  - 배포한 체인코드를 실행하여 블록체인에 write한다.
     Write를 위해서는 설정한 정책에 따라 peer의 서명이 필요하다.
 - Query
   ```sh
@@ -142,7 +144,7 @@ docker ps -a
   # {"ID": "asset6", "color": "white", "size": 15, "owner": "Michel", "appraisedValue": 800}
   # ]
   ```
-  - 배포한 체인코드를 실행하여 블록체인의 정보를 read한다. <br>
+  - 배포한 체인코드를 실행하여 블록체인의 정보를 read한다.
 - 네트워크 종료
   ```sh
   ./network.sh down

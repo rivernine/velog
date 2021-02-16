@@ -505,7 +505,182 @@ export PATH=$PATH:${PWD}/bin
   peer channel list
   ```
   * 2-5에서 생성한 채널 블록을 이용하여 각 ORG마다 채널 조인을 시켜준다.
-### 2-7. 체인코드
+
+### 2-7. 앵커피어설정
+- **[ORG1]** fetch config block
+  ```sh
+  # 환경변수 설정
+  cd fabric-samples/my-network
+  export ORDERER_CA=${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+  # 아래 과정은 모두 아래 path에서 진행
+
+  mkdir anchor && cd anchor
+
+  peer channel fetch config config_block.pb \
+    -o localhost:7050 \
+    --ordererTLSHostnameOverride orderer.example.com \
+    -c mychannel \
+    --tls \
+    --cafile $ORDERER_CA
+  ```
+- **[ORG1]** decoding config block
+  ```sh
+  configtxlator proto_decode \
+    --input config_block.pb \
+    --type common.Block \
+    | jq .data.data[0].payload.data.config \
+    > Org1MSPconfig.json
+  ```
+- **[ORG1]** modify configuration
+  ```sh
+  jq '.channel_group.groups.Application.groups.Org1MSP.values += {"AnchorPeers":{"mod_policy": "Admins","value":{"anchor_peers": [{"host": "peer0.org1.example.com","port": 7051}]},"version": "0"}}' Org1MSPconfig.json \
+    > Org1MSPmodified_config.json
+  ```
+- create config update (ORG1)
+  ```sh
+  configtxlator proto_encode \
+    --input Org1MSPconfig.json \
+    --type common.Config \
+    > original_config.pb
+
+  configtxlator proto_encode \
+    --input Org1MSPmodified_config.json \
+    --type common.Config \
+    > modified_config.pb
+
+  configtxlator compute_update \
+    --channel_id mychannel \
+    --original original_config.pb \
+    --updated modified_config.pb \
+    > config_update.pb
+
+  configtxlator proto_decode \
+    --input config_update.pb \
+    --type common.ConfigUpdate \
+    > config_update.json
+
+  echo '{"payload":{"header":{"channel_header":{"channel_id":"mychannel", "type":2}},"data":{"config_update":'$(cat config_update.json)'}}}' \
+    | jq . \
+    > config_update_in_envelope.json
+
+  configtxlator proto_encode \
+    --input config_update_in_envelope.json \
+    --type common.Envelope \
+    > Org1MSPanchors.tx  
+  ```
+- **[ORG1]** sign
+  ```sh
+  cd fabric-samples/my-network
+
+  export FABRIC_CFG_PATH=${PWD}/config
+  export CORE_PEER_TLS_ENABLED=true
+  export CORE_PEER_LOCALMSPID="Org1MSP"
+  export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+  export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+  export CORE_PEER_ADDRESS=localhost:7051
+
+  cd ./anchor
+  peer channel signconfigtx -f Org1MSPanchors.tx
+  ```
+- **[ORG1]** update
+  ```sh
+  cd ./anchor
+  peer channel update \
+    -o localhost:7050 \
+    --ordererTLSHostnameOverride orderer.example.com \
+    -c mychannel \
+    -f Org1MSPanchors.tx \
+    --tls \
+    --cafile $ORDERER_CA
+  ```
+**<h3>ORG2도 동일하게 진행**</h3>
+- **[ORG2]** fetch config block
+  ```sh
+  # 환경변수 설정
+  cd fabric-samples/my-network
+  export ORDERER_CA=${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+  # 아래 과정은 모두 아래 path에서 진행
+    
+  sudo rm anchor/*
+  cd anchor
+
+  peer channel fetch config config_block.pb \
+    -o localhost:7050 \
+    --ordererTLSHostnameOverride orderer.example.com \
+    -c mychannel \
+    --tls \
+    --cafile $ORDERER_CA
+  ```
+- **[ORG2]** decoding config block
+  ```sh
+  configtxlator proto_decode \
+    --input config_block.pb \
+    --type common.Block \
+    | jq .data.data[0].payload.data.config \
+    > Org2MSPconfig.json
+  ```
+- **[ORG2]** modify configuration
+  ```sh
+  jq '.channel_group.groups.Application.groups.Org2MSP.values += {"AnchorPeers":{"mod_policy": "Admins","value":{"anchor_peers": [{"host": "peer0.org2.example.com","port": 9051}]},"version": "0"}}' Org2MSPconfig.json \
+    > Org2MSPmodified_config.json
+  ```
+- **[ORG2]** create config update
+  ```sh
+  configtxlator proto_encode \
+    --input Org2MSPconfig.json \
+    --type common.Config \
+    > original_config.pb
+
+  configtxlator proto_encode \
+    --input Org2MSPmodified_config.json \
+    --type common.Config \
+    > modified_config.pb
+
+  configtxlator compute_update \
+    --channel_id mychannel \
+    --original original_config.pb \
+    --updated modified_config.pb \
+    > config_update.pb
+
+  configtxlator proto_decode \
+    --input config_update.pb \
+    --type common.ConfigUpdate \
+    > config_update.json
+
+  echo '{"payload":{"header":{"channel_header":{"channel_id":"mychannel", "type":2}},"data":{"config_update":'$(cat config_update.json)'}}}' \
+    | jq . \
+    > config_update_in_envelope.json
+
+  configtxlator proto_encode \
+    --input config_update_in_envelope.json \
+    --type common.Envelope \
+    > Org2MSPanchors.tx  
+  ```
+- **[ORG2]** sign
+  ```sh
+  cd fabric-samples/my-network
+  export FABRIC_CFG_PATH=${PWD}/config
+  export CORE_PEER_TLS_ENABLED=true
+  export CORE_PEER_LOCALMSPID="Org2MSP"
+  export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
+  export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp
+  export CORE_PEER_ADDRESS=localhost:9051
+
+  cd anchor
+  peer channel signconfigtx -f Org2MSPanchors.tx
+  ```
+- **[ORG2]** update
+  ```sh
+  peer channel update \
+    -o localhost:7050 \
+    --ordererTLSHostnameOverride orderer.example.com \
+    -c mychannel \
+    -f Org2MSPanchors.tx \
+    --tls \
+    --cafile $ORDERER_CA
+  ```
+
+### 2-8. 체인코드
 > Fabric 2.x의 체인코드 라이프사이클은 1.x와 다르다.
 > Fabric 1.x: Install -> Instantiate 
 > Fabric 2.x: Package -> Install -> approve -> commit

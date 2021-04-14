@@ -29,49 +29,49 @@
 > 자신의 OS에 git과 docker, docker-compose를 설치하여 사전 준비를 완료하자.
 
 - Git 설치하기
-  ```sh
-  sudo apt-get install git
-  ```
+```sh
+sudo apt-get install git
+```
 - Docker 설치하기
-  ```sh
-  # docker remove
-  sudo apt-get remove docker docker-engine docker.io
+```sh
+# docker remove
+sudo apt-get remove docker docker-engine docker.io
 
-  # docker install
-  sudo apt-get update && sudo apt-get install \
-      apt-transport-https \
-      ca-certificates \
-      curl \
-      software-properties-common
+# docker install
+sudo apt-get update && sudo apt-get install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    software-properties-common
 
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-  sudo add-apt-repository \
-  "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable"
-  sudo apt-get update && sudo apt-get install docker-ce
-  sudo usermod -aG docker $USER
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository \
+"deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+$(lsb_release -cs) stable"
+sudo apt-get update && sudo apt-get install docker-ce
+sudo usermod -aG docker $USER
 
-  # docker-compose install
-  sudo curl -L https://github.com/docker/compose/releases/download/1.21.2/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
-  sudo chmod +x /usr/local/bin/docker-compose
+# docker-compose install
+sudo curl -L https://github.com/docker/compose/releases/download/1.21.2/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
 
-  # check
-  docker --version
-  docker-compose --version
-  ```
+# check
+docker --version
+docker-compose --version
+```
 
 ## 2. Hyperledger Fabric v2.2 인스톨
 > Fabric에서 제공하는 chaincode, shell script등 다양한 예시 코드와 binary, docker image 등을
 > 얻기 위해 Fabric binaries를 다운받자.
 
 - Fabric Binary 설치
-  ```sh
-  # 현 위치에 fabric-samples 디렉토리가 생긴다.
-  curl -sSL https://bit.ly/2ysbOFE | bash -s -- 2.2.1 1.4.9
+```sh
+# 현 위치에 fabric-samples 디렉토리가 생긴다.
+curl -sSL https://bit.ly/2ysbOFE | bash -s -- 2.2.1 1.4.9
 
-  # Installed docker image 확인
-  docker images
-  ```
+# Installed docker image 확인
+docker images
+```
 
 ## 3. 테스트 네트워크 구축하기
 > Hyperledger Fabric은 잘 만들어진 Shell script를 제공한다.<br>
@@ -99,58 +99,60 @@ docker ps -a
 - 흔히 말하는 스마트컨트랙트를 배포한다.
 ### 3-4. 체인코드 실행
 - 환경변수 설정
-  ```sh
-  export PATH=${PWD}/../bin:$PATH
-  export FABRIC_CFG_PATH=$PWD/../config/
-  export ORDERER_CA=${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
-  # Org1 설정
-  export CORE_PEER_TLS_ENABLED=true
-  export CORE_PEER_LOCALMSPID="Org1MSP"
-  export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
-  export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
-  export CORE_PEER_ADDRESS=localhost:7051
-  ```
+```sh
+export PATH=${PWD}/../bin:$PATH
+export FABRIC_CFG_PATH=$PWD/../config/
+export ORDERER_CA=${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+# Org1 설정
+export CORE_PEER_TLS_ENABLED=true
+export CORE_PEER_LOCALMSPID="Org1MSP"
+export CORE_PEER_TLS_ROOTCERT_FILE=${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+export CORE_PEER_ADDRESS=localhost:7051
+```
 - Invoke
-  ```sh
-  peer chaincode invoke \
-    -o localhost:7050 \
-    --ordererTLSHostnameOverride orderer.example.com \
-    --tls \
-    --cafile $ORDERER_CA\
-    -C mychannel \
-    -n basic \
-    --peerAddresses localhost:7051 \
-    --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
-    --peerAddresses localhost:9051 \
-    --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
-    -c '{"function":"InitLedger","Args":[]}'
+- 배포한 체인코드를 실행하여 블록체인에 write한다.
+  Write를 위해서는 설정한 정책에 따라 peer의 서명이 필요하다.
+```sh
+peer chaincode invoke \
+  -o localhost:7050 \
+  --ordererTLSHostnameOverride orderer.example.com \
+  --tls \
+  --cafile $ORDERER_CA\
+  -C mychannel \
+  -n basic \
+  --peerAddresses localhost:7051 \
+  --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \
+  --peerAddresses localhost:9051 \
+  --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \
+  -c '{"function":"InitLedger","Args":[]}'
 
-  # 다음이 나오면 성공
-  # -> INFO 001 Chaincode invoke successful. result: status:200
-  ```
-  - 배포한 체인코드를 실행하여 블록체인에 write한다.
-    Write를 위해서는 설정한 정책에 따라 peer의 서명이 필요하다.
+# 다음이 나오면 성공
+# -> INFO 001 Chaincode invoke successful. result: status:200
+```
+  
+
 - Query
-  ```sh
-  peer chaincode query -C mychannel -n basic -c '{"Args":["GetAllAssets"]}'
+- 배포한 체인코드를 실행하여 블록체인의 정보를 read한다.
+```sh
+peer chaincode query -C mychannel -n basic -c '{"Args":["GetAllAssets"]}'
 
-  # 다음이 나오면 성공
-  # [
-  # {"ID": "asset1", "color": "blue", "size": 5, "owner": "Tomoko", "appraisedValue": 300},
-  # {"ID": "asset2", "color": "red", "size": 5, "owner": "Brad", "appraisedValue": 400},
-  # {"ID": "asset3", "color": "green", "size": 10, "owner": "Jin Soo", "appraisedValue": 500},
-  # {"ID": "asset4", "color": "yellow", "size": 10, "owner": "Max", "appraisedValue": 600},
-  # {"ID": "asset5", "color": "black", "size": 15, "owner": "Adriana", "appraisedValue": 700},
-  # {"ID": "asset6", "color": "white", "size": 15, "owner": "Michel", "appraisedValue": 800}
-  # ]
-  ```
-  - 배포한 체인코드를 실행하여 블록체인의 정보를 read한다.
+# 다음이 나오면 성공
+# [
+# {"ID": "asset1", "color": "blue", "size": 5, "owner": "Tomoko", "appraisedValue": 300},
+# {"ID": "asset2", "color": "red", "size": 5, "owner": "Brad", "appraisedValue": 400},
+# {"ID": "asset3", "color": "green", "size": 10, "owner": "Jin Soo", "appraisedValue": 500},
+# {"ID": "asset4", "color": "yellow", "size": 10, "owner": "Max", "appraisedValue": 600},
+# {"ID": "asset5", "color": "black", "size": 15, "owner": "Adriana", "appraisedValue": 700},
+# {"ID": "asset6", "color": "white", "size": 15, "owner": "Michel", "appraisedValue": 800}
+# ]
+```
 - 네트워크 종료
-  ```sh
-  ./network.sh down
+```sh
+./network.sh down
 
-  # 확인
-  docker ps -a
-  ```
+# 확인
+docker ps -a
+```
 ### 3-5. 마치며
 - 다음 문서에서는 쉘 스크립트가 아닌 직접 블록체인 네트워크를 구성해 볼 것이다.

@@ -7,6 +7,7 @@
   - [2. Parameter substitution](#2-parameter-substitution)
   - [3. Array](#3-array)
   - [4. Condition](#4-condition)
+  - [5. 산술연산](#5-산술연산)
   - [6. Loop](#6-loop)
 ## 0. 개요
 * shell script의 시작은 #!로 한다.
@@ -21,12 +22,12 @@
     - 사용자와 상호작용할 수 있는 기능이 적다.
     - bash에서 사용하던 스크립트가 dash에서는 에러를 뱉을 수 있다.
 * shell script 파일은 실행 권한이 필요하다
-  - ```sh
-    chmod +x $SHELL_SCRIPT.sh
+```sh
+chmod +x $SHELL_SCRIPT.sh
 
-    # 확인
-    ls -al $SHELL_SCRIPT
-    ```
+# 확인
+ls -al $SHELL_SCRIPT
+```
 * 변수의 naming convention은 `UPPERCASE`를 사용한다.        
   
 ## 1. Command substitution
@@ -37,21 +38,25 @@
 * `${parameter}`로 작성한다.
 * {}를 ""로 대체 가능하다.
 * `parameter`는 변수 이름을 넣는다.
-* example
-  - ```bash
-    animal=cat
-    echo $animal
-    # cat
-    echo ${animal}s
-    # cats
-    ```
-  - ```bash
-    animal=cat
-    echo ${#animal}
-    # 3
-    echo ${animal/at/ow}
-    # cow
-    ```
+
+```bash
+# example
+
+animal=cat
+echo $animal
+# cat
+echo ${animal}s
+# cats
+```
+```bash
+# example
+
+animal=cat
+echo ${#animal}
+# 3
+echo ${animal/at/ow}
+# cow
+  ```
 
 ## 3. Array
 * `arr=(obj1 obj2 obj3 ...)`로 선언한다.
@@ -62,45 +67,44 @@
   - `arr[@]/obj1`
 
 ## 4. Condition
-* 조건식
-  - usage
-    ```sh
-    if [ condition ]; then ... elif [ condition ]; then ... else fi
-    ```
-  - example
-    ```sh
-    if [ ${test} = 2 ]; then
-      echo "number is 2"
-    elif [ ${test} = 3 ]; then
-      echo "number is 3"
-    else
-      echo "number is not 2 or 3"
-    fi
-    ```
-* 5. 산술연산
-  - usage
-    ```sh
-    if (( operation )); then ... else fi
-    ```
-  - example
-    ```sh
-    if (( ${test} > 3 )); then
-      echo "number is greater than 3"
-    else
-      echo "number is not greater than 3"
-    fi
-    ```
+- usage
+```sh
+if [ condition ]; then ... elif [ condition ]; then ... else fi
+```
+```sh
+# example
+
+if [ ${test} = 2 ]; then
+  echo "number is 2"
+elif [ ${test} = 3 ]; then
+  echo "number is 3"
+else
+  echo "number is not 2 or 3"
+fi
+```
+## 5. 산술연산
+- usage
+```sh
+if (( operation )); then ... else fi
+```
+```sh
+# example
+
+if (( ${test} > 3 )); then
+  echo "number is greater than 3"
+else
+  echo "number is not greater than 3"
+fi
+```
 
 ## 6. Loop
-* while
-  - usage
-    ```sh
-    while (()); do ... done
-    ```
-* for
-  - usage
-    ```sh
-    for idx in ${arr[@]}; do ... done
-  
-    for (( i = 0; i < 10; i++ )); do ... done
-    ```
+- while
+```sh
+while (()); do ... done
+```
+- for
+```sh
+for idx in ${arr[@]}; do ... done
+
+for (( i = 0; i < 10; i++ )); do ... done
+```

@@ -1,0 +1,18 @@
+{
+    "Issuer": "Issuer",
+
+    "Credential" : "Credential",
+    "CredentialList": "issued list",
+
+    "Schema": "Schema",    
+    "SchemaList": "list",
+    "SchemaCreate": "create",
+    "SchemaUpdate": "update",
+
+    "Definition": "Definition",
+    "DefinitionList": "list",
+    "DefinitionCreate": "create",
+
+    "Configuration": "Configuration",
+    "translation": "한국어"
+}

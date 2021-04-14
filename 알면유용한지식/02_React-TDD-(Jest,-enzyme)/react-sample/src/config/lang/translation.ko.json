@@ -1,0 +1,18 @@
+{
+    "Issuer": "Issuer",
+
+    "Credential" : "Credential",
+    "CredentialList": "발급 목록",
+
+    "Schema": "Schema",    
+    "SchemaList": "목록",
+    "SchemaCreate": "등록",
+    "SchemaUpdate": "수정",
+
+    "Definition": "Definition",
+    "DefinitionList": "목록",
+    "DefinitionCreate": "등록",
+
+    "Configuration": "Configuration",
+    "translation": "English"
+}

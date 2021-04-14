@@ -1,0 +1,80 @@
+#scaffold-src-components-Login-demo-basic .login-warp{
+  max-width: 360px;
+  margin: auto;
+}
+#scaffold-src-components-Login-demo-basic .icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background: url('https://gw.alipayobjects.com/zos/rmsportal/itDzjUnkelhQNsycranf.svg');
+  margin-left: 16px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+#scaffold-src-components-Login-demo-basic .icon-alipay {
+  background-position: -24px 0;
+}
+#scaffold-src-components-Login-demo-basic .icon-alipay:hover {
+  background-position: 0 0;
+}
+#scaffold-src-components-Login-demo-basic .icon-taobao {
+  background-position: -24px -24px;
+}
+#scaffold-src-components-Login-demo-basic .icon-taobao:hover {
+  background-position: 0 -24px;
+}
+#scaffold-src-components-Login-demo-basic .icon-weibo {
+  background-position: -24px -48px;
+}
+#scaffold-src-components-Login-demo-basic .icon-weibo:hover {
+  background-position: 0 -48px;
+}
+
+#components-layout-demo-side .logo {
+  height: 32px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 16px;
+}
+
+.site-layout .site-layout-background {
+  background: #fff;
+}
+
+.title {
+  color: white;
+  font-weight: bold;
+  font-size: 15px;
+  text-align: center;
+  margin: 10px 0 10px 0;
+}
+
+.site-description-item-profile-wrapper {
+  margin-bottom: 7px;
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 14px;
+  line-height: 1.5715;
+}
+
+[data-theme='compact'] .site-description-item-profile-wrapper {
+  font-size: 12px;
+  line-height: 1.66667;
+}
+
+.ant-drawer-body p.site-description-item-profile-p {
+  display: block;
+  margin-bottom: 16px;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 16px;
+  line-height: 1.5715;
+}
+
+[data-theme='compact'] .ant-drawer-body p.site-description-item-profile-p {
+  font-size: 14px;
+  line-height: 1.66667;
+}
+
+.site-description-item-profile-p-label {
+  display: inline-block;
+  margin-right: 8px;
+  color: rgba(0, 0, 0, 0.85);
+}

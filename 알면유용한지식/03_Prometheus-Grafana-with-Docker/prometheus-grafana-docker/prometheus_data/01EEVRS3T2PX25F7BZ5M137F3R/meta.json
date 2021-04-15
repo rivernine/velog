@@ -1,0 +1,17 @@
+{
+	"ulid": "01EEVRS3T2PX25F7BZ5M137F3R",
+	"minTime": 1596501508018,
+	"maxTime": 1596506400000,
+	"stats": {
+		"numSamples": 342426,
+		"numSeries": 351,
+		"numChunks": 2808
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01EEVRS3T2PX25F7BZ5M137F3R"
+		]
+	},
+	"version": 1
+}

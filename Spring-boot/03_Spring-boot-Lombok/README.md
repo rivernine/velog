@@ -21,6 +21,7 @@ TDD를 사용함으로써 우리는
 ```groovy
 dependencies {
 	implementation 'org.projectlombok:lombok'
+  annotationProcessor 'org.projectlombok:lombok'
 }
 ```
 

@@ -104,6 +104,8 @@ public class HelloControllerTest {
 - `@Autowired`
   - Spring이 관리하는 Bean을 주입받는다.
 - `private MockMvc mvc`
+  - Mock: 모조품
+  - 테스트에 필요로하는 기능만으로 가짜 객체를 만들어 mvc동작을 하게 하는 클래스
   - Spring MVC 테스트의 시작점이다.
   - 이 클래스를 통해 HTTP GET, POST등 API 테스트를 할 수 있다.
 - `mvc.perform(get("/hello"))`
@@ -138,3 +140,6 @@ java -jar ./build/lib/*.jar
 # 테스트
 curl localhost:8080/hello   # hello
 ```
+
+---
+*참고서적: 스프링부트와 AWS로 혼자 구현하는 웹 서비스*

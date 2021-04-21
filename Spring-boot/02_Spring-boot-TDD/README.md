@@ -10,7 +10,7 @@
   - [5. Start](#5-start)
   
 ## 0. 개요
-프로젝트 생성은 [**이곳**](!https://velog.io/@rivernine/Spring-boot-Hello-world)을 참조한다.  
+프로젝트 생성은 [**이곳**](https://velog.io/@rivernine/Spring-boot-Hello-world)을 참조한다.  
 
 **TDD (Test-driven Development)** 란 테스트 주도 개발로서 테스트가 주가 되어 개발하는 방법론이다.
 TDD를 사용함으로써 우리는 

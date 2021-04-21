@@ -200,4 +200,5 @@ java -jar ./build/lib/*.jar
 ```
 
 ---
-*참고서적: 스프링부트와 AWS로 혼자 구현하는 웹 서비스*
+**모든 소스는 [깃허브](https://github.com/rivernine/velog/tree/master/Spring-boot)에 올려놓았다.**
+**참고서적: 스프링부트와 AWS로 혼자 구현하는 웹 서비스**

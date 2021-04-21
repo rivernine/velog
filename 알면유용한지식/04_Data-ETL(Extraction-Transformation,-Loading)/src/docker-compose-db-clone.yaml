@@ -1,0 +1,15 @@
+version: '3.1'
+
+services:
+  db-clone:
+    container_name: db-clone
+    image: mariadb:latest
+    restart: always
+    ports:
+      - 3307:3306
+    volumes:
+      - /data/db-clone/data:/var/lib/mysql
+      - /data/db-clone/config:/etc/mysql/conf.d
+    environment:
+      TZ: Asia/Seoul
+      # MYSQL_ROOT_PASSWORD: ${PASSWORD}

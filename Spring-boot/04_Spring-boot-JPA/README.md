@@ -97,7 +97,7 @@ public class Posts {
   
 ## 3. Repository 작성
 1. repository class 생성
-해당 폴더 아래에 `PostsRepository.java`를 만든다.
+`domain/posts` 폴더 아래에 `PostsRepository.java`를 만든다.
 ```java
 package com.example.demo.domain.posts;
 
@@ -125,7 +125,7 @@ spring.datasource.hikari.username=rivernine
 ## 5. 테스트코드 작성
 1. package 생성
 `test`아래에 동일 구조의 폴더를 만든다. `domain/posts`
-1. test class 생성
+2. test class 생성
 해당 폴더 아래에 `PostsRepositoryTest.java`를 만든다.
 ```java
 package com.example.demo.domain.posts;
@@ -184,7 +184,7 @@ public class PostsRepositoryTest {
 ## 4. 테스트
 `Run Test`를 누르면 unit test를 진행할 수 있다.
 
-2. 결과 확인
+1. 결과 확인
 `디버크 콘솔`을 확인하자.
 Spring-boot application이 실행되고 Hibernate의 로그를 확인할 수 있다.
 ![1](./1.PNG)

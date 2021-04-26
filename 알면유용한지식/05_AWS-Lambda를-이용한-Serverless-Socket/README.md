@@ -44,100 +44,100 @@
   * [참고 링크](https://hackernoon.com/websockets-api-gateway-9d4aca493d39)
 
 ### 1.1. Socket Example
-  * client.js
-  ```js
-  const WebSocket = require('ws');
-  const readline = require('readline');
+* client.js
+```js
+const WebSocket = require('ws');
+const readline = require('readline');
 
-  const url = process.argv[2];
-  const ws = new WebSocket(url);
+const url = process.argv[2];
+const ws = new WebSocket(url);
 
-  ws.on('open', () => console.log('connected'));
-  ws.on('message', data => console.log(`${data}`));
-  ws.on('close', () => {
-          console.log('disconnected');
-          process.exit();
-  });
+ws.on('open', () => console.log('connected'));
+ws.on('message', data => console.log(`${data}`));
+ws.on('close', () => {
+        console.log('disconnected');
+        process.exit();
+});
 
-  const r1 = readline.createInterface({
-          input: process.stdin,
-          output: process.stdout,
-  });
+const r1 = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+});
 
-  r1.on('line', data => {
-          const message = JSON.stringify({action: 'echo', data: data});
-          ws.send(message);
-  });
-  ```
+r1.on('line', data => {
+        const message = JSON.stringify({action: 'echo', data: data});
+        ws.send(message);
+});
+```
 
-  * server.js
-  ```js
-  const WebSocket = require('ws');
-  const short = require('short-uuid');
+* server.js
+```js
+const WebSocket = require('ws');
+const short = require('short-uuid');
 
-  const connections = {};
-  const send = (connectionId, data) => {
-    const connection = connections[connectionId];
-    connection.send(data);
+const connections = {};
+const send = (connectionId, data) => {
+  const connection = connections[connectionId];
+  connection.send(data);
+}
+
+const defaultActions = {
+  connect: (connection) => {
+    const id = short.generate();
+    connection.connectionId = id
+    connections[id] = connection;
+    console.log(`client connected with connectionId: ${id}`);
+    customActions.connect && customActions.connect(id);
+  },
+  disconnect: (connectionId) => {
+    delete connections[connectionId];
+    console.log(`client disconnected with connectionId: ${connectionId}`);
+    customActions.disconnect && customActions.disconnect(connectionId);
+  },
+  default: (connectionId, message) => {
+    customActions.default ? customActions.default(connectionId) :
+      send(connectionId, message ? `unrecognized action: ${message.action}`
+        : `message cannot be empty`)
+  },
+};
+
+const customActions = {
+  echo: (connectionId, data) => {
+    send(connectionId, data);
   }
+};
 
-  const defaultActions = {
-    connect: (connection) => {
-      const id = short.generate();
-      connection.connectionId = id
-      connections[id] = connection;
-      console.log(`client connected with connectionId: ${id}`);
-      customActions.connect && customActions.connect(id);
-    },
-    disconnect: (connectionId) => {
-      delete connections[connectionId];
-      console.log(`client disconnected with connectionId: ${connectionId}`);
-      customActions.disconnect && customActions.disconnect(connectionId);
-    },
-    default: (connectionId, message) => {
-      customActions.default ? customActions.default(connectionId) :
-        send(connectionId, message ? `unrecognized action: ${message.action}`
-          : `message cannot be empty`)
-    },
-  };
-
-  const customActions = {
-    echo: (connectionId, data) => {
-      send(connectionId, data);
+const wss = new WebSocket.Server({ port: 8080 });
+wss.on('connection', socket => {
+  defaultActions.connect(socket);
+  socket.on('message', messageJson => {
+    console.log(`Received: ${messageJson}`);
+    try {
+      const { action, data } = JSON.parse(messageJson);
+      // call the matching custom handler, else call the default handler
+      const customHandler = customActions[action];
+      customHandler ? customHandler(socket.connectionId, data) :
+        defaultActions.default(socket.connectionId, { action, data });
+    } catch (ex) {
+      console.error(ex);
+      socket.send(`Bad Request format, use: '{"action": ..., "data": ...}'`);
     }
-  };
-
-  const wss = new WebSocket.Server({ port: 8080 });
-  wss.on('connection', socket => {
-    defaultActions.connect(socket);
-    socket.on('message', messageJson => {
-      console.log(`Received: ${messageJson}`);
-      try {
-        const { action, data } = JSON.parse(messageJson);
-        // call the matching custom handler, else call the default handler
-        const customHandler = customActions[action];
-        customHandler ? customHandler(socket.connectionId, data) :
-          defaultActions.default(socket.connectionId, { action, data });
-      } catch (ex) {
-        console.error(ex);
-        socket.send(`Bad Request format, use: '{"action": ..., "data": ...}'`);
-      }
-    });
-    socket.on('close', () => {
-      defaultActions.disconnect(socket.connectionId);
-    });
   });
+  socket.on('close', () => {
+    defaultActions.disconnect(socket.connectionId);
+  });
+});
 
-  console.log(`Listening on ws://localhost:8080`);
-  ``` 
+console.log(`Listening on ws://localhost:8080`);
+``` 
 
-  * Execute
-  ```bash
-  # Console 1
-  node server.js
-  # Console 2
-  node client.js ws://localhost:8080
-  ``` 
+* Execute
+```bash
+# Console 1
+node server.js
+# Console 2
+node client.js ws://localhost:8080
+``` 
 
 ## 2. 서버리스 소켓통신
 ### 2.1. Serverless Socket Example 1
@@ -299,4 +299,3 @@ node client.js $WEB_SOCKET_URL
 주로 role일 가능성이 농후. (AWS IAM 사용법 숙지)
 
 ---
-**<center>2019-11-07 강재구</center>**

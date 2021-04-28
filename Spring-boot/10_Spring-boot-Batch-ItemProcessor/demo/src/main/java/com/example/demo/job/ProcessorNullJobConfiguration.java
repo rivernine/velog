@@ -23,13 +23,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @Configuration
-public class ProcessorConvertJobConfiguration {
-  public static final String JOB_NAME = "processorConvertBatch";
+public class ProcessorNullJobConfiguration {
+  
+  public static final String JOB_NAME = "processorNullBatch";
   public static final String BEAN_PREFIX = JOB_NAME + "_";
 
   private final JobBuilderFactory jobBuilderFactory;
   private final StepBuilderFactory stepBuilderFactory;
-  private final EntityManagerFactory entityManagerFactory;  
+  private final EntityManagerFactory emf;
 
   @Value("${chunkSize:1000}")
   private int chunkSize;
@@ -46,34 +47,41 @@ public class ProcessorConvertJobConfiguration {
   @JobScope
   public Step step() {
     return stepBuilderFactory.get(BEAN_PREFIX + "step")
-            .<Pay, String>chunk(chunkSize)
+            .<Pay, Pay>chunk(chunkSize)
             .reader(reader())
             .processor(processor())
             .writer(writer())
             .build();
   }
 
-  @Bean
+  @Bean(BEAN_PREFIX + "reader")
   public JpaPagingItemReader<Pay> reader() {
     return new JpaPagingItemReaderBuilder<Pay>()
-                .name(BEAN_PREFIX+"reader")
-                .entityManagerFactory(entityManagerFactory)
-                .pageSize(chunkSize)
-                .queryString("SELECT t FROM Pay t")
-                .build();
+            .name(BEAN_PREFIX+"reader")
+            .entityManagerFactory(emf)
+            .pageSize(chunkSize)
+            .queryString("SELECT t FROM Pay t")
+            .build();
   }
 
-  @Bean
-  public ItemProcessor<Pay, String> processor() {
+  @Bean(BEAN_PREFIX + "processor")
+  public ItemProcessor<Pay, Pay> processor() {
     return pay -> {
-      return pay.getTxName();
+
+      boolean isIgnoreTarget = pay.getAmount() > 2000L;
+      if(isIgnoreTarget){
+        log.info(">>>>>>>>> Pay txName={}, amount={}, isIgnoreTarget={}", pay.getTxName(), pay.getAmount(), isIgnoreTarget);
+        return null;
+      }
+
+      return pay;
     };
   }
 
-  private ItemWriter<String> writer() {
+  private ItemWriter<Pay> writer() {
     return items -> {
-      for (String item: items) {
-        log.info("Pay TxName={}", item);
+      for (Pay item : items) {
+        log.info("pay txName={}, amount={}", item.getTxName(), item.getAmount());
       }
     };
   }

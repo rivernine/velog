@@ -1,342 +1,301 @@
 # Spring-boot Batch ItemProcessor
-## 🎁 목차
+## 🎁 Contents
 - [Spring-boot Batch ItemProcessor](#spring-boot-batch-itemprocessor)
-  - [🎁 목차](#-목차)
-  - [0. 개요](#0-개요)
-  - [1. Database Writer](#1-database-writer)
-  - [2. JdbcBatchItemWriter](#2-jdbcbatchitemwriter)
-    - [2.1. Create JdbcBatchItemWriter](#21-create-jdbcbatchitemwriter)
-    - [2.2 Create pay2 table](#22-create-pay2-table)
-    - [2.3. Execute](#23-execute)
-    - [2.4. Check](#24-check)
-  - [3. JpaItemWriter](#3-jpaitemwriter)
-    - [3.1. Create JpaItemWriter](#31-create-jpaitemwriter)
+  - [🎁 Contents](#-contents)
+  - [0. Summary](#0-summary)
+  - [1. ItemProcessor](#1-itemprocessor)
+  - [2. ItemProcessor Transformation](#2-itemprocessor-transformation)
+    - [2.1. Create convert processor](#21-create-convert-processor)
+    - [2.2. Execute](#22-execute)
+    - [2.3. Check](#23-check)
+  - [3. ItemProcessor Filter](#3-itemprocessor-filter)
+    - [3.1. Create filter processor](#31-create-filter-processor)
     - [3.2. Execute](#32-execute)
     - [3.3. Check](#33-check)
-  - [4. Custom ItemWriter](#4-custom-itemwriter)
-    - [4.1. Create CustomItemWriter](#41-create-customitemwriter)
+  - [4. ItemProcessor chaining](#4-itemprocessor-chaining)
+    - [4.1. Create Composite Processor](#41-create-composite-processor)
     - [4.2. Execute](#42-execute)
     - [4.3. Check](#43-check)
 
-## 0. 개요
-**ItemWriter**는 출력 기능이다.
-초창기 Spring Batch는 item을 하나씩 다루었지만, 현재는 chunk 단위로 묶인 item List를 다룬다.
-Reader의 `read()`는 Item을 하나 반환하는 반면, Writer의 `write()`는 인자로 Item List를 받는다.
-**즉, Reader와 Processor를 거쳐 처리된 Item을 Chunk단위 만큼 쌓은 뒤 이를 Writer에게 전달한다.**
+## 0. Summary
+**ItemProcessor**는 데이터를 가공하거나 필터링하는 역할이다.
+**ItemWriter**에서 충분히 구현 가능하고 따라서 Processor는 필수가 아니다.
+하지만 읽기/처리/쓰기를 분리할 수 있어 사용을 권장한다.
 
-## 1. Database Writer
-Java에서는 JDBC또는 ORM을 사용하여 RDBMS에 접근한다.
-Spring Batch는 JDBC와 ORM 모두 Writer를 제공한다.
-**Writer는 Chunk단위의 마지막 단계이며 항상 마지막에 `Flush`를 해줘야 한다.**
-Writer가 받은 모든 Item이 처리된 후, Spring Batch는 현재 트랜잭션을 커밋한다.
+## 1. ItemProcessor
+**ItemReader**에서 넘겨준 데이터 **개별**건을 가공/처리한다.
+데이터를 원하는 타입으로 변환하거나 원하는 데이터를 필터링하여 전달할 수도 있다.
 
-Database Writer의 종류는 다음과 같다. 다음 중 **bold**표시 된 항목을 알아보겠다.
-  - **JdbcBatchItemWriter**
-  - HibernateItemWriter
-  - **JpaItemWriter**
+`ItemProcessor`는 다음과 같이 구성되어 있다.
+```java
+public interface ItemProcessor<I, O> {
+  O process(I item) throws Exception;
+}
+```
+- `I`
+  - ItemReader에서 받을 데이터 타입
+- `O`
+  - ItemWriter에게 보낼 데이터 타입     
 
-## 2. JdbcBatchItemWriter
-JdbcBatchItemWriter는 다음과 같이 동작한다.
-1. ChunkSize만큼 Query 모으기
-2. 모아놓은 Query 한번에 전송
-3. 받은 쿼리들 Database에서 실행
+`ItemReader`가 읽은 데이터를 `ItemProcessor`의 `process()`를 통과하여 `ItemWriter`에게 전달된다.
+코드의 양이 많아지면 별도의 클래스로 분리해서 쓰기도 하지만 보통은 익명함수를 사용한다.
 
-### 2.1. Create JdbcBatchItemWriter
-- `JdbcBatchItemWriterJobConfiguration.java`
+## 2. ItemProcessor Transformation
+`ItemReader`로 읽어온 데이터의 타입을 변환시켜 `ItemWriter`에 전달하는 예제이다.
+### 2.1. Create convert processor
+- `ProcessorConvertJobConfiguration.java`
 ```java
 @Slf4j
 @RequiredArgsConstructor
 @Configuration
-public class JdbcBatchItemWriterJobConfiguartion {
+public class ProcessorConvertJobConfiguration {
+  public static final String JOB_NAME = "processorConvertBatch";
+  public static final String BEAN_PREFIX = JOB_NAME + "_";
+
   private final JobBuilderFactory jobBuilderFactory;
   private final StepBuilderFactory stepBuilderFactory;
-  private final DataSource dataSource;
+  private final EntityManagerFactory entityManagerFactory;  
 
-  private static final int chunkSize = 10;
+  @Value("${chunkSize:1000}")
+  private int chunkSize;
 
-  @Bean
-  public Job jdbcBatchItemWriterJob() {
-    return jobBuilderFactory.get("jdbcBatchItemWriterJob")
-            .start(jdbcBatchItemWriterStep())
+  @Bean(JOB_NAME)
+  public Job job() {
+    return jobBuilderFactory.get(JOB_NAME)
+            .preventRestart()
+            .start(step())
+            .build();
+  }
+
+  @Bean(BEAN_PREFIX + "step")
+  @JobScope
+  public Step step() {
+    return stepBuilderFactory.get(BEAN_PREFIX + "step")
+            .<Pay, String>chunk(chunkSize)
+            .reader(reader())
+            .processor(processor())
+            .writer(writer())
             .build();
   }
 
   @Bean
-  public Step jdbcBatchItemWriterStep() {
-    return stepBuilderFactory.get("jdbcBatchItemWriterStep")
-            .<Pay, Pay>chunk(chunkSize)
-            .reader(jdbcBatchItemWriterReader())
-            .writer(jdbcBatchItemWriter())
-            .build();
-  }
-
-  @Bean
-  public JdbcCursorItemReader<Pay> jdbcBatchItemWriterReader() {
-    return new JdbcCursorItemReaderBuilder<Pay>()
-                .fetchSize(chunkSize)
-                .dataSource(dataSource)
-                .rowMapper(new BeanPropertyRowMapper<>(Pay.class))
-                .sql("SELECT id, amount, tx_name, tx_date_time FROM pay")
-                .name("jdbcBatchItemWriterReader")
+  public JpaPagingItemReader<Pay> reader() {
+    return new JpaPagingItemReaderBuilder<Pay>()
+                .name(BEAN_PREFIX+"reader")
+                .entityManagerFactory(entityManagerFactory)
+                .pageSize(chunkSize)
+                .queryString("SELECT t FROM Pay t")
                 .build();
   }
 
-  // beanMapped()를 사용할 떄는 필수
   @Bean
-  public JdbcBatchItemWriter<Pay> jdbcBatchItemWriter() {
-    // ColumnMapped()
-    // return new JdbcBatchItemWriterBuilder<Map<String, Object>>()
-    //             .dataSource(dataSource)
-    //             .sql("insert into pay2(amount, tx_name, tx_date_time) values (:amount, :txName, :txDateTime)")
-    //             .columnMapped()
-    //             .build();
+  public ItemProcessor<Pay, String> processor() {
+    return pay -> {
+      return pay.getTxName();
+    };
+  }
 
-    // BeanMapped()
-    return new JdbcBatchItemWriterBuilder<Pay>()
-                .dataSource(dataSource)
-                .sql("insert into pay2(amount, tx_name, tx_date_time) values (:amount, :txName, :txDateTime)")
-                .beanMapped()
-                .build();
+  private ItemWriter<String> writer() {
+    return items -> {
+      for (String item: items) {
+        log.info("Pay TxName={}", item);
+      }
+    };
   }
 }
 ```
-- `JdbcBatchItemWriter`
-  - reader에서 넘어온 데이터를 하나씩 출력하는 wrtier
-- `JdbcBatchItemWriterBuilder`
-  - `columnMapped` 설정 : <Key, Value> 기반의 insert SQL Values 매핑
-    - ex) `JdbcBatchItemWriterBuilder<Map<String, Object>>()`
-  - `beanMapped` 설정 : Pojo 기반의 insert SQL Values 매핑
-    - ex) `JdbcBatchItemWriterBuilder<Pay>()`
 
-### 2.2 Create pay2 table
-ItemWriter를 활용하여 `pay2`라는 테이블에 데이터를 삽입할 것이다.
-mysql에 접속하여 `pay2` 테이블을 만들어준다.
-```mysql
-create table pay2 (
-  id         bigint not null auto_increment,
-  amount     bigint,
-  tx_name     varchar(255),
-  tx_date_time datetime,
-  primary key (id)
-) engine = InnoDB;
-```
-
-### 2.3. Execute
+### 2.2. Execute
 ```sh
 ./gradlew build -x test
 
-java -jar ./build/libs/*.jar --job.name=jdbcBatchItemWriterJob
+java -jar ./build/libs/*.jar --job.name=processorConvertBatch
 ```
 
-### 2.4. Check
+### 2.3. Check
 ![](./1.png)
 
-`pay2`테이블을 확인해보면 데이터가 들어간 것을 확인할 수 있다.
+`Pay`클래스가 `ItemProcessor`를 통해 String으로 잘 변환된 것을 확인할 수 있다.
 
-## 3. JpaItemWriter
-ORM을 사용할 수 있는 `JpaItemWriter`이다.
-Writer에 전달하는 데이터가 Entity 클래스라면 `JpaItemWriter`를 사용하면 된다.
-
-### 3.1. Create JpaItemWriter
-`JpaItemWriter`는 넘어온 Entity를 Database에 반영한다.
-즉, `JpaItemWriter`는 Entity 클래스를 제네릭 타입으로 받아야한다.
-
-- `JpaItemWriterJobConfiguration.java`
+## 3. ItemProcessor Filter
+`ItemReader`로 읽어온 데이터 중 필터링 된 데이터만 `ItemWriter`에게 전달하는 예제이다.
+### 3.1. Create filter processor
+- `ProcessorConvertJobConfiguration.java`
 ```java
 @Slf4j
 @RequiredArgsConstructor
 @Configuration
-public class JpaItemWriterJobConfiguration {
+public class ProcessorNullJobConfiguration {
+  
+  public static final String JOB_NAME = "processorNullBatch";
+  public static final String BEAN_PREFIX = JOB_NAME + "_";
+
   private final JobBuilderFactory jobBuilderFactory;
   private final StepBuilderFactory stepBuilderFactory;
-  private final EntityManagerFactory entityManagerFactory;
+  private final EntityManagerFactory emf;
 
-  private static final int chunkSize = 10;
+  @Value("${chunkSize:1000}")
+  private int chunkSize;
 
-  @Bean
-  public Job jpaItemWriterJob() {
-    return jobBuilderFactory.get("jpaItemWriterJob")
-            .start(jpaItemWriterStep())
+  @Bean(JOB_NAME)
+  public Job job() {
+    return jobBuilderFactory.get(JOB_NAME)
+            .preventRestart()
+            .start(step())
             .build();
   }
 
-  @Bean
-  public Step jpaItemWriterStep() {
-    return stepBuilderFactory.get("jpbItemWriterStep")
-            .<Pay, Pay2>chunk(chunkSize)
-            .reader(jpaItemWriterReader())
-            .processor(jpaItemProcessor())
-            .writer(jpaItemWriter())
+  @Bean(BEAN_PREFIX + "step")
+  @JobScope
+  public Step step() {
+    return stepBuilderFactory.get(BEAN_PREFIX + "step")
+            .<Pay, Pay>chunk(chunkSize)
+            .reader(reader())
+            .processor(processor())
+            .writer(writer())
             .build();
   }
 
-  @Bean
-  public JpaPagingItemReader<Pay> jpaItemWriterReader() {
+  @Bean(BEAN_PREFIX + "reader")
+  public JpaPagingItemReader<Pay> reader() {
     return new JpaPagingItemReaderBuilder<Pay>()
-                .name("jpaItemWriterReader")
-                .entityManagerFactory(entityManagerFactory)
-                .pageSize(chunkSize)
-                .queryString("SELECT p FROM Pay p")
-                .build();
+            .name(BEAN_PREFIX+"reader")
+            .entityManagerFactory(emf)
+            .pageSize(chunkSize)
+            .queryString("SELECT t FROM Pay t")
+            .build();
   }
 
-  @Bean
-  public ItemProcessor<Pay, Pay2> jpaItemProcessor() {
-    return pay -> new Pay2(pay.getAmount(), pay.getTxName(), pay.getTxDateTime());
+  @Bean(BEAN_PREFIX + "processor")
+  public ItemProcessor<Pay, Pay> processor() {
+    return pay -> {
+
+      boolean isIgnoreTarget = pay.getAmount() > 2000L;
+      if(isIgnoreTarget){
+        log.info(">>>>>>>>> Pay txName={}, isIgnoreTarget={}", pay.getTxName(), isIgnoreTarget);
+        return null;
+      }
+
+      return pay;
+    };
   }
 
-  @Bean
-  public JpaItemWriter<Pay2> jpaItemWriter() {
-    JpaItemWriter<Pay2> jpaItemWriter = new JpaItemWriter<>();
-    jpaItemWriter.setEntityManagerFactory(entityManagerFactory);
-
-    return jpaItemWriter;
+  private ItemWriter<Pay> writer() {
+    return items -> {
+      for (Pay item : items) {
+        log.info("pay txName={}", item.getTxName());
+      }
+    };
   }
 }
-```
-
-- `Pay2.java`
-```java
-@ToString
-@Getter
-@Setter
-@NoArgsConstructor
-@Entity
-public class Pay2 {
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private Long amount;
-    private String txName;
-    private LocalDateTime txDateTime;
-
-    public Pay2(Long amount, String txName, String txDateTime) {
-        this.amount = amount;
-        this.txName = txName;
-        this.txDateTime = LocalDateTime.parse(txDateTime, FORMATTER);
-    }
-
-    public Pay2(Long amount, String txName, LocalDateTime txDateTime) {
-        this.amount = amount;
-        this.txName = txName;
-        this.txDateTime = txDateTime;
-    }
-
-    public Pay2(Long id, Long amount, String txName, String txDateTime) {
-        this.id = id;
-        this.amount = amount;
-        this.txName = txName;
-        this.txDateTime = LocalDateTime.parse(txDateTime, FORMATTER);
-    }
-}
-```
-
-- `Pay2Repository.java`
-```java
-public interface Pay2Repository extends JpaRepository<Pay2, Long> { }
 ```
 
 ### 3.2. Execute
 ```sh
 ./gradlew build -x test
 
-java -jar ./build/libs/*.jar --job.name=jpaItemWriterJob
+java -jar ./build/libs/*.jar --job.name=processorNullBatch
 ```
 
 ### 3.3. Check
 ![](./2.png)
 
-`pay2`테이블에 추가로 데이터가 들어간 것을 확인할 수 있다.
+`Pay` 테이블의 row 중 amount가 3000이상인 것을 제외한 나머지가 필터링되어졌다.
 
-## 4. Custom ItemWriter
-Writer를 Custom하게 구현해야 할 일은 빈번하다.
-예를 들어 다음과 같은 경우가 있다.
-  - Reader에서 읽어온 데이터를 RestTemplate으로 외부 API에 전달할 경우
-  - Singleton 객체에 값을 넣을 경우
-  - 여러 Entity를 save할 경우
+## 4. ItemProcessor chaining
+`ItemProcessor`가 여러 기능을 포함할 경우를 생각해보자.
+하나의 `ItemProcessor` 역할이 점점 커지게 될 것이다.
 
-이러한 경우 `ItemWriter` 인터페이스를 구현하면 된다.
-`System.out.println`의 역할을 하는 Writer를 만들어보자.
-### 4.1. Create CustomItemWriter
-- `CustomItemWriterJobConfiguration.java` 
+**이를 위해 `CompositeItemProcessor` 구현체가 존재한다.**
+이는 `ItemProcessor`간의 체이닝을 지원한다.
+
+### 4.1. Create Composite Processor
+- `ProcessorCompositeJobConfiguration.java` 
 ```java
 @Slf4j
 @RequiredArgsConstructor
 @Configuration
-public class CustomItemWriterJobConfiguration {
-  private final JobBuilderFactory jobBuilderFactory;
-  private final StepBuilderFactory stepBuilderFactory;
-  private final EntityManagerFactory entityManagerFactory;
+public class ProcessorCompositeJobConfiguration {
 
-  private static final int chunkSize = 10;
+    public static final String JOB_NAME = "processorCompositeBatch";
+    public static final String BEAN_PREFIX = JOB_NAME + "_";
 
-  @Bean
-  public Job customItemWriterJob() {
-    return jobBuilderFactory.get("customItemWriterJob")
-            .start(customItemWriterStep())
-            .build();
-  }
+    private final JobBuilderFactory jobBuilderFactory;
+    private final StepBuilderFactory stepBuilderFactory;
+    private final EntityManagerFactory emf;
 
-  @Bean
-  public Step customItemWriterStep() {
-    return stepBuilderFactory.get("customItemWriterStep")
-            .<Pay, Pay2>chunk(chunkSize)
-            .reader(customItemWriterReader())
-            .processor(customItemWriterProcessor())
-            .writer(customItemWriter())
-            .build();
-  }
+    @Value("${chunkSize:1000}")
+    private int chunkSize;
 
-  @Bean
-  public JpaPagingItemReader<Pay> customItemWriterReader() {
-    return new JpaPagingItemReaderBuilder<Pay>()
-                .name("customeItemWriterReader")
-                .entityManagerFactory(entityManagerFactory)
-                .pageSize(chunkSize)
-                .queryString("SELECT p FROM Pay p")
+    @Bean(JOB_NAME)
+    public Job job() {
+        return jobBuilderFactory.get(JOB_NAME)
+                .preventRestart()
+                .start(step())
                 .build();
-  }
+    }
 
-  @Bean
-  public ItemProcessor<Pay, Pay2> customItemWriterProcessor() {
-    return pay -> new Pay2(pay.getAmount(), pay.getTxName(), pay.getTxDateTime());
-  }
+    @Bean(BEAN_PREFIX + "step")
+    @JobScope
+    public Step step() {
+        return stepBuilderFactory.get(BEAN_PREFIX + "step")
+                .<Pay, String>chunk(chunkSize)
+                .reader(reader())
+                .processor(compositeProcessor())
+                .writer(writer())
+                .build();
+    }
 
-  @Bean
-  public ItemWriter<Pay2> customItemWriter() {
-    // Java8 이상
-    return items -> {
-      for (Pay2 item : items) {
-        System.out.println(item);
-      }
-    };
+    @Bean(BEAN_PREFIX + "reader")    
+    public JpaPagingItemReader<Pay> reader() {
+        return new JpaPagingItemReaderBuilder<Pay>()
+                .name(BEAN_PREFIX+"reader")
+                .entityManagerFactory(emf)
+                .pageSize(chunkSize)
+                .queryString("SELECT t FROM Pay t")
+                .build();
+    }
 
-    // Java7 이하
-    // return new ItemWriter<Pay2>() {
-    //   // 다음과 같이 write()를 override로 구현한다.
-    //   @Override
-    //   public void write(List<? extends Pay2> items) throws Exception {
-    //     for (Pay2 item : items) {
-    //       System.out.println(item);
-    //     }
-    //   }
-    // };
-  }
-}
+    @Bean(BEAN_PREFIX + "processor")
+    public CompositeItemProcessor compositeProcessor() {
+        List<ItemProcessor> delegates = new ArrayList<>(2);
+        delegates.add(processor1());
+        delegates.add(processor2());
+
+        CompositeItemProcessor processor = new CompositeItemProcessor<>();
+
+        processor.setDelegates(delegates);
+
+        return processor;
+    }
+
+    public ItemProcessor<Pay, String> processor1() {
+        return Pay::getTxName;
+    }
+
+    public ItemProcessor<String, String> processor2() {
+        return name -> "트랜잭션 이름은"+ name + "입니다.";
+    }
+
+    private ItemWriter<String> writer() {
+        return items -> {
+            for (String item : items) {
+                log.info("Pay Name={}", item);
+            }
+        };
+    }
 ```
 
 ### 4.2. Execute
 ```sh
 ./gradlew build -x test
 
-java -jar .\build\libs\demo-0.0.1-SNAPSHOT.jar --job.name=customItemWriterJob
+java -jar .\build\libs\demo-0.0.1-SNAPSHOT.jar --job.name=processorCompositeBatch
 ```
 ### 4.3. Check
 ![](./3.png)
 
-`pay` 테이블의 데이터가 `pay2`로 처리되어 출력되었다.
+`Pay`에서 String(`txName`)으로 변환되고, String이 또다른 String으로 변환된 것을 볼 수 있다.
 
 ---
 **모든 소스는 [깃허브](https://github.com/rivernine/velog/tree/master/Spring-boot)에 올려놓았다.**

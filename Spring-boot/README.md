@@ -17,6 +17,7 @@
 
 - `@Component`
 직접 개발한 클래스**를 Bean으로 등록하고자 하는 경우 사용한다.
+`@Scope("Prototype")`으로 singleton이 아닌 bean을 생성할 수도 있다.
 
 - `@Bean` vs. `@Component`
   - `@Bean`
@@ -25,6 +26,72 @@
   - `@Component`
     - 직접 개발한 클래스 등록
     - Class level에서 적용
+
+## DI(Dependency Injection)
+Spring Framework에서 의존성을 주입하는 방법은 3가지가 존재한다.
+- 생성자 주입 (Constructor Injection)
+- 필드 주입 (Field Injection)
+- 수정자 주입 (Setter Injection)
+
+### 필드 주입 (Field Injection)
+```java
+@Service
+public class FieldServiceImpl implements FieldService {
+
+  @Autowired
+  private SampleService sampleService;
+
+}
+```
+
+### 수정자 주입 (Setter Injection)
+```java
+@Service
+public class SetterServiceImpl implements SetterService {
+
+  private SampleService sampleService;
+
+  @Autowired
+  public void setSampleService(SampleService sampleService) {
+    this.sampleService = sampleService;
+  }
+
+}
+```
+
+### 생성자 주입 (Constructor Injection)
+생성자에 `@Autowired`를 붙여 주입한다.
+단일 생성자의 경우 붙이지 않아도 된다.
+
+```java
+@Service
+public class ConstructorServiceImpl implements ConstructorService {
+
+  private final SampleService sampleService;
+
+  @Autowired
+  public ConstructorServiceImpl(SampleService sampleService) {
+    this.sampleService = sampleService;
+  }
+
+}
+```
+
+### 생성자 주입의 장점
+Spring-boot에서도 Constructor Injection을 권장한다.
+그 배경엔 다음과 같은 장점이 있다.
+- `NullPointerException` 방지
+  - 의존관계에 대한 내용을 외부로 노출시킴으로써 **컴파일 오류**를 잡아낼 수 있다.
+- 주입받을 필드를 `final`로 선언 가능
+  - 즉, 런타임에 객체 불변성을 보장한다.
+- 순환참조 방지
+  > A->B, B->A와 같은 참조 관계의 경우 다른 DI는 문제없이 어플리케이션이 작동한다.
+  > 그러나 실제 코드가 호출되면 에러를 뱉으며 작동이 중지된다.
+  > Constructor Injection은 이를 사전방지해준다.
+  >
+  > Field & Setter Injection은 먼저 빈을 생성한 후 주입하려는 빈을 찾아 주입한다.
+  > 그러나 **Constructor Injection은 주입하려는 빈을 먼저 찾기때문에(객체 생성 시점에 빈을 주입) 사전에 오류가 발생한다.**
+- 테스트코드 작성 용이
 
 ## IoC / DI - Bean
 component, bean을 context영역에두어 springboot framework가 관리하게 해준다.
@@ -35,6 +102,7 @@ spring-boot에서는 application context에서 bean을 singletone형태로 관�
 
 ## annotationProcessor
 컴파일러 단계에서 유저가 정의한 어노테이션의 소스코드를 분석하고 처리하기 위해 사용되는 훅이다.
+
 
 # Test
 ## Junit 5
@@ -60,11 +128,3 @@ Mock: 모조품
 메소드 체이닝이 지원되어 `isEqualTo()`와 같이 사용할 수 있음
 `JUnit` 지원 메소드와 `assertj` 둘 중 하나를 선택 사용 
 
-## Bean Scope
-스프링에서 Bean을 생성할 때, 모든 Bean이 싱글톤으로 생성된다.
-어디에서든지 Bean을 주입받는다면 동일한 Bean을 주입받는 것을 보장한다.
-그러나 Bean 생성시, Scope를 prototype으로 주면 Bean 주입마다 새로운 인스턴스가 생성된다.
-
-## @Component
-singleton bean을 생성하는 어노테이션이다.
-`@Scope("Prototype")`으로 singleton이 아닌 bean을 생성할 수도 있다.

@@ -12,7 +12,7 @@
     - [3.2. Usage Scope](#32-usage-scope)
     - [3.3. Scope and Bean](#33-scope-and-bean)
   - [4. Execute specific Job](#4-execute-specific-job)
-    - [4.1. `application.yml` 추가](#41-applicationyml-추가)
+    - [4.1. Update `application.yml`](#41-update-applicationyml)
     - [4.2. Execute](#42-execute)
     - [4.3. How to use Job parameter with Program arguments](#43-how-to-use-job-parameter-with-program-arguments)
   - [5. Execute Job in Controller](#5-execute-job-in-controller)
@@ -154,7 +154,7 @@ public Tasklet scopeStep2Tasklet(@Value("#{jobParameters[requestDate]}") String 
 ## 4. Execute specific Job
 기본적으로 등록되어진 모든 job이 실행된다.
 원하는 batch job만 실행하고 싶은 경우 사용한다.
-### 4.1. `application.yml` 추가
+### 4.1. Update `application.yml`
 Program arguments로 `job.name`이 넘어오면 해당 값과 일치하는 job만 실행하는 옵션
   - `job.name`이 있으면 `job.name`할당, 없으면 `NONE`할당
 ```yml

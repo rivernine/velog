@@ -27,6 +27,9 @@ dependencies {
 	// jdbc
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 
+	// quartz
+	implementation 'org.springframework.boot:spring-boot-starter-quartz'
+
 	// lombok
 	implementation 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

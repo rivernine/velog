@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 // ItemProcessor: 읽어온 데이터를 가공/처리.
 // ItemWriter: 가공/처리한 데이터를 DB, file 등에 저장. 
 
-// @EnableBatchProcessing		// 배치기능 활성화
+@EnableBatchProcessing		// 배치기능 활성화
 // @EnableScheduling
 @SpringBootApplication
 public class DemoApplication {

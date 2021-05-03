@@ -1,0 +1,14 @@
+version: '2'
+
+networks:
+  ci:
+
+services:
+  jenkins:
+    container_name: jenkins
+    image: jenkins/jenkins
+    # 원하는 경로에 volume 마운트
+    volumes:
+      - ~/jenkins/:/var/jenkins_home
+    networks:
+      - ci

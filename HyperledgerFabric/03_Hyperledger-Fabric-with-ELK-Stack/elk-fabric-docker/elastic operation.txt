@@ -1,0 +1,41 @@
+- 192.168.56.2 : logstash
+- 192.168.56.3 : fabric, eventlisten, filebeats, kibana
+- 192.168.56.4 : elastic
+
+-  ELK 스택 무료 강의 
+ https://www.inflearn.com/course/elk-%EC%8A%A4%ED%83%9D-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EB%B6%84%EC%84%9D#description
+
+- mapping 추가
+PUT /jackdb/_mapping
+{
+    "properties" : {
+        "title" : {
+            "type" : "text"
+        }
+    }
+}
+
+- 7.x 부터는 type을 _doc로 지정해야함.
+
+- bulk
+PUT /museums
+{
+    "mappings": {
+        "properties": {
+            "location": {
+                "type": "geo_point"
+            }
+        }
+    }
+}
+
+POST /museums/_bulk?
+{"index":{"_id":1}}
+{"location": "52.37,4.91}
+
+- fabric event listner(go)
+https://medium.com/@jushuspace/hyperledger-fabric-event-listener-tutorial-2484614a9e4
+https://github.com/hyperledger/fabric/blob/release-1.4/examples/events/eventsclient/eventsclient.go
+
+- base64 decode
+https://www.base64decode.org/

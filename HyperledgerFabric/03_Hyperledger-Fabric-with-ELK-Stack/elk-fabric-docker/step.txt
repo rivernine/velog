@@ -1,0 +1,35 @@
+192.168.56.10 : elastic + logstash + kibana
+192.168.56.20 : fabric + eventlistener + filebeat
+
+
+1) elastic download
+ -- local --
+wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.2.0-linux-x86_64.tar.gz
+tar -zcvf elasticsearch-7.2.0-linux-x86_64.tar.gz
+
+ -- docker -- 
+docker pull docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+
+
+2) logstash download
+ -- local --
+wget https://artifacts.elastic.co/downloads/logstash/logstash-7.2.0.tar.gz
+tar -zcvf logstash-7.2.0.tar.gz
+
+ -- docker -- 
+docker pull docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+
+3) kibana download
+ -- local --
+wget https://artifacts.elastic.co/downloads/kibana/kibana-7.2.0-linux-x86_64.tar.gz
+tar -zcvf kibana-7.2.0-linux-x86_64.tar.gz
+
+ -- docker -- 
+docker pull docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+
+4) elk 스택 config파일 수정 및 docker-compose.yml 작성
+
+
+4) filebeat download
+
+docker pull docker.elastic.co/beats/filebeat:6.5.4

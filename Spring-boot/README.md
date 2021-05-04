@@ -1,5 +1,87 @@
 # Spring-boot framework
 
+## Rest API
+
+### Parameter passing in `Get` method
+- PathVariable
+```java
+@GetMapping("/test/{value}")
+public String getTest(@PathVariable("value") String value) {  
+  return value;
+}
+```
+
+- Request parameter
+```java
+@GetMapping("/hello/dto")
+public String cryptoDto(@RequestParam("value") String value) {
+  return value;
+}
+```
+
+### Return to json
+Json형식으로 return을 하고 싶을 때 사용한다.
+```java
+@GetMapping("/test")
+public String getTest(@PathVariable("value") String value) {  
+  JsonObject result = new JsonObject();    
+
+  result.addProperty("title", "제목입니다.");
+  result.addProperty("value", value);
+
+  return result.toString();
+}
+```
+
+
+---
+
+## Json
+Spring-boot 에서 사용하는 Json library 중 대표적으로 `jackson`과 `gson`이 있다.
+그 중 `Gson`을 통해 Json을 핸들링한다.
+
+### JsonString to JsonObject
+`JsonParser`와 `Gson` 중 하나를 이용하여 parsing할 수 있다.
+```java
+
+@Test
+public void convert_string_to_json() throws Exception {
+  String jsonString = "{ \"name\": \"Jack\", \"java\": true }";
+  // 방법 1
+  JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
+
+  // 방법 2
+  JsonObject jsonObject = new Gson().fromJson(jsonString, JsonObject.class);
+
+  assertThat(jsonObject.get("name").getAsString()).isEqualTo("Jack");
+}
+```
+
+### JsonArrayString to JsonObject
+```java
+@Test
+public void convert_array_to_json() throws Exception {
+  Gson gson = new Gson();
+  String jsonString = "[{ \"name\": \"Jack\", \"java\": true }]";
+
+  JsonObject[] jsonObjectArray = gson.fromJson(jsonString, JsonObject[].class);
+
+  for( int i = 0; i < jsonObjectArray.length; i++ ){
+    JsonObject jsonObject = jsonObjectArray[i];
+    assertThat(jsonObject.get("name").getAsString()).isEqualTo("Jack");
+  }
+}
+```
+
+
+---
+
+## Lombok
+Lombok에서 제공하는 `@RequiredArgsConstructor` 어노테이션은 초기화 되지 않은 `final`필드, `@NotNull`이 붙은 필드에 대해 생성자를 생성해 준다.
+DI 편의성을 위해 사용되곤 한다.
+
+---
+
 ## Bean
 스프링 IoC(Inversion of Control) 컨테이너에 의해 관리되고 애플리케이션의 핵심을 이루는 객체들을 Beans라고 부른다.
 다시말해, IoC컨테이너에 의해 인스턴스화되어 관리되는 객체를 말한다.
@@ -26,6 +108,8 @@
   - `@Component`
     - 직접 개발한 클래스 등록
     - Class level에서 적용
+
+---
 
 ## DI(Dependency Injection)
 Spring Framework에서 의존성을 주입하는 방법은 3가지가 존재한다.
@@ -103,9 +187,10 @@ spring-boot에서는 application context에서 bean을 singletone형태로 관�
 ## annotationProcessor
 컴파일러 단계에서 유저가 정의한 어노테이션의 소스코드를 분석하고 처리하기 위해 사용되는 훅이다.
 
+---
 
-# Test
-## Junit 5
+## Test
+### Junit 5
 `org.springframework.boot:spring-boot-starter-test`는 junit4에 의존성을 가지고 있다.
 junit5를 사용하기 위해서는 이를 제외시키고 따로 추가하여야 한다.
 ```groovy
@@ -119,12 +204,15 @@ dependencies {
 }
 ```
 
-## MockMvc
+### MockMvc
 Mock: 모조품
 테스트에 필요로하는 기능만으로 가짜 객체를 만들어 mvc동작을 하게 하는 클래스
 
-## AssertThat
+### AssertThat
 테스트 중 두 값을 비교하는데에 사용
 메소드 체이닝이 지원되어 `isEqualTo()`와 같이 사용할 수 있음
 `JUnit` 지원 메소드와 `assertj` 둘 중 하나를 선택 사용 
+
+### Controller test
+
 

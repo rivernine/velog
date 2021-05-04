@@ -14,7 +14,7 @@
   - [3. PagingItemReader](#3-pagingitemreader)
     - [3.1. JdbcPagingItemReader](#31-jdbcpagingitemreader)
     - [3.2. JpaPagingItemReader](#32-jpapagingitemreader)
-    - [4. ItemReader 주의 사항](#4-itemreader-주의-사항)
+  - [4. ItemReader 주의 사항](#4-itemreader-주의-사항)
   
 ## 0. 개요
 Step은 Tasklet단위로 처리되고, Tasklet 중  **ChunkOrientedTasklet**을 통해 Chunk를 처리하며 이는 ItemReader, ItemWriter, ItemProcessor로 구성된다.
@@ -371,7 +371,7 @@ java -jar ./build/libs/*.jar --job.name=jpaPagingItemReaderJob
 
 마찬가지로 잘 작동한다.
 
-### 4. ItemReader 주의 사항
+## 4. ItemReader 주의 사항
 - JpaRepository를 ListItemReader, QueueItemReader에 사용하면 안된다.
   - ex) `new ListItemReader<>(jpaRepository.findByAge(age))`
   - 이 경우, paging과 cursor 구현이 없어 대규모 데이터 처리가 불가하다.

@@ -16,7 +16,7 @@ spring:
   datasource:
     hikari:
       # MYSQL_ADDR:PORT/DATABASE
-      jdbc-url: jdbc:mysql://192.168.56.103:3306/spring_batch
+      jdbc-url: jdbc:mysql://192.168.56.103:3306/etl
       username: rivernine
       password: rivernine
       # mysql용 jdbc드라이버

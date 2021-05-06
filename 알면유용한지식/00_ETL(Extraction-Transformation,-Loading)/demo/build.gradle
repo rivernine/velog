@@ -15,27 +15,13 @@ repositories {
 }
 
 dependencies {
-	// spring-boot with rest api
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-
-	// spring-boot batch
-	implementation 'org.springframework.boot:spring-boot-starter-batch'
-
-	// jpa
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-
-	// jdbc
-	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-
-	// lombok
-	implementation 'org.projectlombok:lombok'
+	implementation (
+		'org.springframework.boot:spring-boot-starter-batch',			// Batch
+		'org.springframework.boot:spring-boot-starter-jdbc',			// Jdbc
+		'org.projectlombok:lombok',																// Lombok
+		'mysql:mysql-connector-java',															// Mysql
+	)
 	annotationProcessor 'org.projectlombok:lombok'
-
-	// inmemory
-	implementation 'com.h2database:h2'
-
-	// mysql
-	implementation 'mysql:mysql-connector-java'
 
 	// test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

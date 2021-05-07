@@ -21,4 +21,9 @@ spring:
       password: rivernine
       # mysql용 jdbc드라이버
       driver-class-name: com.mysql.jdbc.Driver
-
+  secondDatasource:
+    hikari:
+      jdbc-url: jdbc:mysql://192.168.56.103:3307/etl
+      username: rivernine
+      password: rivernine      
+      driver-class-name: com.mysql.jdbc.Driver

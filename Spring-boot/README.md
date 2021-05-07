@@ -109,6 +109,12 @@ DI 편의성을 위해 사용되곤 한다.
     - 직접 개발한 클래스 등록
     - Class level에서 적용
 
+### `@Lazy`와 `@Primary`
+- `@Lazy`
+  - Bean을 등록할 때 상단에 `@Lazy`를 써주면 해당 Bean이 호출 될 때 Bean이 생성된다.
+- `@Primary`
+  - 동일 클래스로 다른 Bean을 등록할 경우 `@Primary`를 같이 사용한 Bean이 기본으로 등록된다.
+
 ---
 
 ## DI(Dependency Injection)

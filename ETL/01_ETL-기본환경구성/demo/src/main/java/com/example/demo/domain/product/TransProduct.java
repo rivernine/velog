@@ -19,20 +19,27 @@ public class TransProduct {
   private String name;
   private Long price;
   private LocalDateTime created;
-  private boolean isDiscount;
+  private boolean discount;
 
-  public TransProduct(String name, Long price, String created, boolean isDiscount) {
+  public TransProduct(String name, Long price, String created, boolean discount) {
     this.price = price;
     this.name = name;
     this.created = LocalDateTime.parse(created, FORMATTER);
-    this.isDiscount = isDiscount;
+    this.discount = discount;
   }
 
-  public TransProduct(Long id, String name, Long price, String created, boolean isDiscount) {
+  public TransProduct(String name, Long price, LocalDateTime created, boolean discount) {
+    this.price = price;
+    this.name = name;
+    this.created = created;
+    this.discount = discount;
+  }
+
+  public TransProduct(Long id, String name, Long price, String created, boolean discount) {
     this.id = id;
     this.price = price;
     this.name = name;
     this.created = LocalDateTime.parse(created, FORMATTER);
-    this.isDiscount = isDiscount;
+    this.discount = discount;
   }
 }

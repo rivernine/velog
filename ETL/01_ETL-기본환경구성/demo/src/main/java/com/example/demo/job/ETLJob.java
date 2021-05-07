@@ -1,5 +1,6 @@
 package com.example.demo.job;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import javax.sql.DataSource;
@@ -14,7 +15,10 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
+import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,9 +35,16 @@ public class ETLJob {
 
   private final JobBuilderFactory jobBuilderFactory;
   private final StepBuilderFactory stepBuilderFactory;
-  private final DataSource dataSource;
 
-  @Value("${chunkSize:1000}")
+  @Qualifier("sourceDataSource")
+  @Autowired
+  private DataSource sourceDataSource;
+
+  @Qualifier("targetDataSource")
+  @Autowired
+  private DataSource targetDataSource;
+
+  @Value("${chunkSize:100}")
   private int chunkSize;
 
   @Bean(JOB_NAME)
@@ -58,7 +69,7 @@ public class ETLJob {
   public JdbcCursorItemReader<Product> reader() {
     return new JdbcCursorItemReaderBuilder<Product>()
             .fetchSize(chunkSize)
-            .dataSource(dataSource)
+            .dataSource(sourceDataSource)
             .rowMapper(new BeanPropertyRowMapper<>(Product.class))
             .sql("SELECT id, name, price, created FROM product")
             .name("JdbcCursorItemReader")
@@ -68,14 +79,13 @@ public class ETLJob {
   @Bean
   public ItemProcessor<Product, TransProduct> processor() {
     return product -> {
-      Long id = product.getId();
       String name = product.getName();
       Long price = product.getPrice();
-      String created =product.getCreated().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+      LocalDateTime created = product.getCreated();
       if( price > 2500 ) {
-        return new TransProduct(id, name, price - 500L, created, true);
+        return new TransProduct(name, price - 500L, created, true);
       } else {
-        return new TransProduct(id, name, price, created, false);
+        return new TransProduct(name, price, created, false);
       }
     };
   }
@@ -83,7 +93,9 @@ public class ETLJob {
   @Bean
   public JdbcBatchItemWriter<TransProduct> writer() {
     return new JdbcBatchItemWriterBuilder<TransProduct>()
-                .dataSource(dataSource)
-                .sql("INSERT INTO transproduct(id, name, price, create, )")
+                .dataSource(targetDataSource)
+                .sql("INSERT INTO trans_product(name, price, created, discount) values (:name, :price, :created, :discount)")
+                .beanMapped()
+                .build();
   }
 }

@@ -1,6 +1,9 @@
 spring:
   profiles:
     active: mysql
+  batch.job.names: ${job.name:NONE}
+
+logging.level.org.springframework.batch: DEBUG
 
 ---
 spring:
@@ -13,7 +16,7 @@ spring:
 ---
 spring:
   profiles: mysql
-  datasource:
+  source-datasource:
     hikari:
       # MYSQL_ADDR:PORT/DATABASE
       jdbc-url: jdbc:mysql://192.168.56.103:3306/etl
@@ -21,7 +24,7 @@ spring:
       password: rivernine
       # mysql용 jdbc드라이버
       driver-class-name: com.mysql.jdbc.Driver
-  secondDatasource:
+  target-datasource:
     hikari:
       jdbc-url: jdbc:mysql://192.168.56.103:3307/etl
       username: rivernine

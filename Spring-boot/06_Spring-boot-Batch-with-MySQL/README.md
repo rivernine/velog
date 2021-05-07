@@ -59,7 +59,7 @@ docker exec -it db-source bash
 mysql -u root -p
 ## 패스워드 입력
 
-CREATE DATABASE study_db default CHARACTER SET UTF8;
+CREATE DATABASE spring_batch default CHARACTER SET UTF8;
 SHOW DATABASES;
 
 # spring에서 접속할 것 이므로 localhost가 아닌 %를 써준다.

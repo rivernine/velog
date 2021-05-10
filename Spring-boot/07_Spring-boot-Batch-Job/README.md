@@ -14,7 +14,7 @@
   - [4. Execute specific Job](#4-execute-specific-job)
     - [4.1. Update `application.yml`](#41-update-applicationyml)
     - [4.2. Execute](#42-execute)
-    - [4.3. How to use Job parameter with Program arguments](#43-how-to-use-job-parameter-with-program-arguments)
+    - [4.3. How to use Job parameter](#43-how-to-use-job-parameter)
   - [5. Execute Job in Controller](#5-execute-job-in-controller)
 
 
@@ -149,6 +149,7 @@ public Tasklet scopeStep2Tasklet(@Value("#{jobParameters[requestDate]}") String 
 이 기능을 통해 다음과 같은 장점을 가진다.
 1. JobParameter의 Late Binding
    - Application 실행 시점이 아니더라도 Controller나 Service와 같은 **비지니스 로직 처리에서 Job Parameter를 할당할 수 있다.**
+
 2. 동일 컴포넌트의 병렬처리
 
 ## 4. Execute specific Job
@@ -163,10 +164,13 @@ spring.batch.job.names: ${job.name:NONE}
 ### 4.2. Execute
 다음은 **Program arguments**를 선언하는 방법이다.
 `java -jar *.jar --job.name=stepNextJob`
-### 4.3. How to use Job parameter with Program arguments
-**Job parameter**는 `version=1`과 같이 써준다.
-**Program arguments**는 `--job.name`과 같이 `--`을 붙여준다.
+
+### 4.3. How to use Job parameter
 `java -jar *.jar version=1 --job.name=stepNextJob`
+- `version=1`
+  - Job parameter
+- `--job.name`
+  - `application.yml`의 `job.name`에 stepNextJob이라는 값을 할당해줌
 
 ## 5. Execute Job in Controller
 만약 외부에서 넘겨주는 파라미터에 따라 Batch가 다르게 실행되는 예제이다.

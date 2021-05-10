@@ -9,17 +9,17 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 @Configuration
-public class DataSourceConfig {
-  @Bean(name = "sourceDataSource")
+public class DataSourceConfiguration {
+  @Bean(name = "dataSource-dbsource")
   @Primary
-  @ConfigurationProperties(prefix="spring.source-datasource.hikari")
-  public DataSource sourceDataSource() {
+  @ConfigurationProperties(prefix="spring.datasource-dbsource.hikari")
+  public DataSource dataSourceDbSource() {
     return DataSourceBuilder.create().build();
   }
 
-  @Bean(name = "targetDataSource")
-  @ConfigurationProperties(prefix="spring.target-datasource.hikari")
-  public DataSource targetDataSource() {
+  @Bean(name = "dataSource-dbtarget")
+  @ConfigurationProperties(prefix="spring.datasource-dbtarget.hikari")
+  public DataSource dataSourceDbTarget() {
     return DataSourceBuilder.create().build();
   }
 }

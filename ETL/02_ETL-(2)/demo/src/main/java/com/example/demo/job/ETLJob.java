@@ -36,13 +36,13 @@ public class ETLJob {
   private final JobBuilderFactory jobBuilderFactory;
   private final StepBuilderFactory stepBuilderFactory;
 
-  @Qualifier("sourceDataSource")
+  @Qualifier("dataSource-dbsource")
   @Autowired
-  private DataSource sourceDataSource;
+  private DataSource dataSourceDbSource;
 
-  @Qualifier("targetDataSource")
+  @Qualifier("dataSource-dbtarget")
   @Autowired
-  private DataSource targetDataSource;
+  private DataSource dataSourceDbTarget;
 
   @Value("${chunkSize:100}")
   private int chunkSize;
@@ -69,7 +69,7 @@ public class ETLJob {
   public JdbcCursorItemReader<Product> reader() {
     return new JdbcCursorItemReaderBuilder<Product>()
             .fetchSize(chunkSize)
-            .dataSource(sourceDataSource)
+            .dataSource(dataSourceDbSource)
             .rowMapper(new BeanPropertyRowMapper<>(Product.class))
             .sql("SELECT id, name, price, created FROM product")
             .name("JdbcCursorItemReader")
@@ -93,7 +93,7 @@ public class ETLJob {
   @Bean
   public JdbcBatchItemWriter<TransProduct> writer() {
     return new JdbcBatchItemWriterBuilder<TransProduct>()
-                .dataSource(targetDataSource)
+                .dataSource(dataSourceDbTarget)
                 .sql("INSERT INTO trans_product(name, price, created, discount) values (:name, :price, :created, :discount)")
                 .beanMapped()
                 .build();

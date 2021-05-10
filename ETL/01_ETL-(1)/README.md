@@ -1,7 +1,7 @@
-# ETL 기본환경구성
+# ETL (1)
 
 ## 🎁 Contents
-- [ETL 기본환경구성](#etl-기본환경구성)
+- [ETL (1)](#etl-1)
   - [🎁 Contents](#-contents)
   - [0. Summary](#0-summary)
   - [1. Launch databases](#1-launch-databases)
@@ -46,6 +46,7 @@ container로 DB를 올리면 `MYSQL_ROOT_PASSWORD`라는 환경변수를 설정�
 mkdir -p ~/etl-sample
 touch ~/etl-sample/docker-compose.yaml
 ```
+- `docker-compose.yaml`
 ```yaml
 version: '3.1'
 
@@ -196,6 +197,7 @@ ETL을 사용하기 위해 Spring-boot 환경설정을 한다.
 
 ### 2.1. Add dependencies
 `build.gradle`에 ETL에 필요한 라이브러리를 추가한다.
+- `build.gradle`
 ```groovy
 dependencies {
 	implementation (
@@ -289,7 +291,13 @@ public class TransProduct {
 
 ### 2.3.1 Update `application.yml`
 먼저, `application.yml`에 `db-source`와 `db-target`의 `datasource` 정보를 입력한다.
+- `application.yml`
 ```yaml
+spring:
+  profiles:
+    active: mysql
+  batch.job.names: ${job.name:NONE}
+---
 spring:
   profiles: mysql
   datasource-dbsource:
@@ -310,6 +318,7 @@ spring:
 
 ### 2.3.2. Create `DataSourceConfiguration.java`
 `config/DataSourceConfiguration.java`를 생성하고 수정한다.
+- `DataSourceConfiguration.java`
 ```java
 @Configuration
 public class DataSourceConfiguration {

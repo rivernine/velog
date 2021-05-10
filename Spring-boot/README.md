@@ -115,6 +115,11 @@ DI 편의성을 위해 사용되곤 한다.
 - `@Primary`
   - 동일 클래스로 다른 Bean을 등록할 경우 `@Primary`를 같이 사용한 Bean이 기본으로 등록된다.
 
+### `@Autowired(required = false)` 
+의존성을 **Optional**로 설정하는 것이다.
+주입받을 의존객체가 필수적이지 않을 경우 `@Autowired(required = false)`로 설정해서 의존객체를 주입받지 못하더라도 빈을 생성하도록 할 수 있다.
+
+
 ---
 
 ## DI(Dependency Injection)

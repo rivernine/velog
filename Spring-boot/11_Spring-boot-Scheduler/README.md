@@ -14,15 +14,13 @@
     - [3.1. Create `docker-compose.yaml`](#31-create-docker-composeyaml)
     - [3.2. Run Jenkins](#32-run-jenkins)
     - [3.3. Init Jenkins](#33-init-jenkins)
-  - [4. Create `jar` file](#4-create-jar-file)
-    - [4.1. Execute `jar`](#41-execute-jar)
-    - [4.2. Check](#42-check)
-  - [5. Set the Schedule](#5-set-the-schedule)
-    - [5.1. Create item](#51-create-item)
-    - [5.2. Enter an item name](#52-enter-an-item-name)
-    - [5.3. Move jar to Jenkins workspace](#53-move-jar-to-jenkins-workspace)
-    - [5.4. Set the schedule](#54-set-the-schedule)
-  - [6. Check](#6-check)
+    - [3.4. Create `jar` file](#34-create-jar-file)
+    - [3.5. Set the Schedule](#35-set-the-schedule)
+      - [3.5.1. Create item](#351-create-item)
+      - [3.5.2. Enter an item name](#352-enter-an-item-name)
+      - [3.5.3. Move jar to Jenkins workspace](#353-move-jar-to-jenkins-workspace)
+      - [3.5.4. Set the schedule](#354-set-the-schedule)
+    - [3.6. Check](#36-check)
   
 ## 0. Summary
 Linux crontab과 같은 scheduler를 Spring-boot에서 다뤄보자.
@@ -164,14 +162,13 @@ cat /var/jenkins_home/secrets/initialAdminPassword
 패스워드를 입력하고 플러그인들을 다운받고 다음단계에서 계정을 생성하면 Jenkins 초기셋팅이 완료된다.
 > 향후 Jenkins에서 원하는 플러그인을 모두 받을 수 있다.
 
-## 4. Create `jar` file
+### 3.4. Create `jar` file
 Jenkins가 구동되는 서버에 Spring-boot `jar`파일을 옮기는 작업이다.
 **Jenkins는 해당 `jar`파일을 설정된 주기로 실행시켜주는 역할을 할 것이다.**
 
 아래는 spring batch의 `jar`파일을 다룬다.
 > 모든 소스는 페이지 하단 링크에 있다.
 
-### 4.1. Execute `jar`
 Spring-boot 환경의 서버에서 jar를 만든 후 Jenkins서버에 jar파일을 옮긴다.
 ```sh
 ##### Spring-boot Server #####
@@ -181,29 +178,27 @@ Spring-boot 환경의 서버에서 jar를 만든 후 Jenkins서버에 jar파일�
 # Jenkins 서버에 jar파일을 복제한다.
 scp ./build/libs/*.jar $USER@$JENKINS_SERVER:~
 
-
 ##### Jenkins Server #####
 # Jar파일 실행
 java -jar ~/*.jar
 ```
 
-### 4.2. Check
 ![](./2.png)
 Jenkins서버에서 `jar`를 실행하면 다음과 같은 결과를 확인할 수 있다.
 `simpleStep1`이 실행된 것을 볼 수 있다.
 
 이 작업을 Jenkins Scheduler가 주기적으로 실행시켜줄 것이다!
 
-## 5. Set the Schedule
-Jenkins에서 스케줄링을 등록한다.
+### 3.5. Set the Schedule
+이제 위에서 만든 `jar`를 Jenkins에서 스케줄링하자.
 
-### 5.1. Create item
+#### 3.5.1. Create item
 ![](./3.png)
 
-### 5.2. Enter an item name
+#### 3.5.2. Enter an item name
 ![](./4.png)
 
-### 5.3. Move jar to Jenkins workspace
+#### 3.5.3. Move jar to Jenkins workspace
 item을 만들면 workspace가 생성된다.
 새로운 workspace에 `jar`를 옮기기 위한 작업이다.
 ![](./5.png)
@@ -224,7 +219,7 @@ item을 만들면 workspace가 생성된다.
 ![](./8.png)
 ![](./9.png)
 
-### 5.4. Set the schedule
+#### 3.5.4. Set the schedule
 이제 `jar`파일을 주기적으로 실행시켜주면 끝이다.
 `구성`을 눌러 방금 생성한 item를 수정한다.
 ![](./10.png)
@@ -236,7 +231,7 @@ item을 만들면 workspace가 생성된다.
 `java -jar demo-0.0.1-SNAPSHOT.jar`
 ![](./12.png)
 
-## 6. Check
+### 3.6. Check
 이제 Jenkins가 1분마다 빌드를 하는것을 볼 수 있다.
 ![](./13.png)
 

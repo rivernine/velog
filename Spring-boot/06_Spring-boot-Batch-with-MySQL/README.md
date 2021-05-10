@@ -12,7 +12,9 @@
 
   
 ## 0. 개요
-[이전 포스트](https://velog.io/@rivernine/Spring-boot-Batch)와 같이 `h2`와 같은 인메모리 db를 사용하면 spring-boot이 **메타데이터 테이블**들을 자동으로 생성해준다. 
+> **[이전 포스트](https://velog.io/@rivernine/Spring-boot-Batch)와 이어지는 내용이다.**
+
+Spring batch에 `h2`와 같은 인메모리 db를 사용하면 spring-boot이 **메타데이터 테이블**들을 자동으로 생성해준다. 
 하지만 `mysql`과 같은 db를 사용하면 직접 생성해야 한다.
 
 ## 1. MySQL 띄우기

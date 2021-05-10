@@ -16,7 +16,7 @@ spring:
 ---
 spring:
   profiles: mysql
-  source-datasource:
+  datasource-dbsource:
     hikari:
       # MYSQL_ADDR:PORT/DATABASE
       jdbc-url: jdbc:mysql://192.168.56.103:3306/etl
@@ -24,7 +24,7 @@ spring:
       password: rivernine
       # mysql용 jdbc드라이버
       driver-class-name: com.mysql.jdbc.Driver
-  target-datasource:
+  datasource-dbtarget:
     hikari:
       jdbc-url: jdbc:mysql://192.168.56.103:3307/etl
       username: rivernine

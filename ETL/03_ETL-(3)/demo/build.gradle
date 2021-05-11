@@ -1,0 +1,33 @@
+plugins {
+	id 'org.springframework.boot' version '2.4.3'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+	id 'application'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+mainClassName = 'com.example.demo.DemoApplication'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation (
+		'org.springframework.boot:spring-boot-starter-batch',			// Batch
+		'org.springframework.boot:spring-boot-starter-jdbc',			// Jdbc
+		'org.projectlombok:lombok',																// Lombok
+		'mysql:mysql-connector-java',															// Mysql
+	)
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// test
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.batch:spring-batch-test'
+}
+
+test {
+	useJUnitPlatform()
+}

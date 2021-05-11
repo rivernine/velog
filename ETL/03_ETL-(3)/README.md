@@ -62,6 +62,7 @@ java -jar $PWD/demo-0.0.1-SNAPSHOT.jar --job.name=etlJob requestDate=$(date | tr
 ```
 
 ## 4. Check
+`Build History`에서 1분마다 Batch가 실행되는 것을 확인할 수 있다.
 ![](./1.png)
 
 ---

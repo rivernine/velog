@@ -1,5 +1,21 @@
 # redis cluster
 
+## setup
+```sh
+# 메모리 사용량이 허용량을 초과할 경우, overcommit을 처리하는 방식 결정하는 값을 "항상"으로 변경
+$ sudo sysctl vm.overcommit_memory=1
+$ sudo echo "vm.overcommit_memory=1" >> /etc/sysctl.conf 
+$ sudo sysctl -a | grep vm.overcommit
+
+# 서버 소켓에 Accept를 대기하는 소켓 개수 파라미터를 변경
+$ sudo sysctl -w net.core.somaxconn=1024
+$ sudo echo "net.core.somaxconn=1024" >> /etc/sysctl.conf 
+$ sudo sysctl -a | grep somaxconn
+
+# THP(Transparent Huge Pages) 기능이 Enable 되어 있는 경우 Redis에서는 이를 Disable 시킬 것을 권장한다.
+```
+
+
 ## docker-compose.yaml
 ```yaml
 version: '3'
@@ -134,6 +150,8 @@ f1f6a1c8fea47794c07184ccb9b15c9ba31f2033 127.0.0.1:7002@17002 master - 0 1624425
 |node1|192.168.56.100|redis-master-1, redis-slave-3|
 |node2|192.168.56.101|redis-master-2, redis-slave-1|
 |node3|192.168.56.102|redis-master-3, redis-slave-2|
+
+
 
 1. create cluster
 ```sh

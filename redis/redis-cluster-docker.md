@@ -1,7 +1,7 @@
-# Redis docker
+# Redis hands on
 
 ## 🎁 목차
-- [Redis docker](#redis-docker)
+- [Redis hands on](#redis-hands-on)
   - [🎁 목차](#-목차)
   - [개요](#개요)
   - [다운로드](#다운로드)
@@ -12,12 +12,10 @@ redis 버전은 6.2.3을 사용한다.
 
 ## 다운로드
 1. Pull redis image 
-
 ```sh
 $ docker pull redis:6.2.3
 $ docker images | grep 'redis'
 redis                              6.2.3              bc8d70f9ef6c        5 weeks ago         105MB
-
 ```
 
 ```sh

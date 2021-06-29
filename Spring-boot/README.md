@@ -1,5 +1,11 @@
 # Spring-boot framework
 
+## LocalDateTIme
+Database의 date타입과 매핑하기위해 자주 사용하는 타입이다.
+
+
+---
+
 ## Rest API
 
 ### Parameter passing in `Get` method

@@ -1,13 +1,12 @@
-# Redis
+# Redis concept
 
 ## 🎁 목차
-- [Redis](#redis)
+- [Redis concept](#redis-concept)
   - [🎁 목차](#-목차)
   - [개요](#개요)
   - [Stand alone](#stand-alone)
   - [Sentinel](#sentinel)
   - [Cluster](#cluster)
-  
 
 ## 개요
 Redis(Remote Dictionary Server)는 key-value구조의 NoSQL DB이다.

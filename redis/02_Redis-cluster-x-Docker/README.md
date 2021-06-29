@@ -1,7 +1,7 @@
-# Redis cluster (1)
+# Redis cluster x Docker
 
 ## 🎁 목차
-- [Redis cluster (1)](#redis-cluster-1)
+- [Redis cluster x Docker](#redis-cluster-x-docker)
   - [🎁 목차](#-목차)
   - [개요](#개요)
   - [1. Setup](#1-setup)

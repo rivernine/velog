@@ -12,7 +12,6 @@ import org.springframework.web.client.RestTemplate;
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
 public class UpbitApiTest {  
-
   
   @Test
   public void getMarketsTest() {

@@ -38,8 +38,7 @@
 이것이 바로 비트코인의 실시간 시세이다.
 우리는 향후 이를 DTO로 저장할 것이다.
 
-> 업비트에서 제공하는 api정보와 목록들은 다음 링크에서 확인할 수 있다.
-> [업비트 개발자 센터](https://docs.upbit.com/)
+> 업비트에서 제공하는 api정보와 목록들은 [업비트 개발자 센터](https://docs.upbit.com/)에서 확인할 수 있다.
 
 ## 2. Spring-boot x Upbit
 먼저 spring-boot과 upbit api를 연동해보자.
@@ -60,7 +59,7 @@ dependencies {
   - Rest call을 위해 사용할 라이브러리이다.
 - `com.google.code.gson:gson`
   - Json object의 직렬화/역직렬화를 위해 사용할 json 라이브러리이다.
-  - 
+  
 ### 2.1. 테스트코드 작성
 `src/test/java/com/rivernine/cryptogenerator`아래에 `upbitApiTest`를 만들었다.
 

@@ -18,6 +18,7 @@
 ## 0. 프로젝트 생성
 필자는 Spring-boot 프로젝트를 생성할 때 [spring initializr](https://start.spring.io/)를 이용한다.
 - spring initializr
+  
 ![](./1.png)
 
 - Project: `Gradle`

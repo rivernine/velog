@@ -21,13 +21,19 @@ pip로 kaggle을 설치한다.
 $ pip3 install --user kaggle
 ```
 
-#### 3. check
+#### 3. API Key
+1. `https://www.kaggle.com/<username>/account`에 접속하여 `Create API Token`을 클릭한다.
+2. `kaggle.json`파일을 `~/.kaggle/kaggle.json`에 저장
+3. `chmod 600 ~/.kaggle/kaggle.json`
+
+
+#### 4. check
 제대로 설치되었는지 확인해본다.
 ```sh
 $ kaggle dataset -h
 ```
 
-#### 3-1. troubleshooting
+#### 4-1. troubleshooting
 만일 `kaggle: command not found`에러가 발생하면 python binary 폴더를 PATH에 추가한다.
 ```sh
 $ sudo vim ~/.profile
@@ -35,7 +41,7 @@ $ sudo vim ~/.profile
 PATH=$PATH:$HOME.local/bin/kaggle
 ```
 
-#### 4. Download csv
+#### 5. Download csv
 ```sh
 # kaggle datasets download <owner>/<dataset-name>
 $ kaggle datasets download mkechinov/ecommerce-behavior-data-from-multi-category-store

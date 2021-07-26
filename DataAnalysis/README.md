@@ -12,7 +12,7 @@
 #### 1. pip
 `pip`가 존재하지 않는다면 설치해준다
 ```sh
-$ sudo apt-get install python-pip3
+$ sudo apt-get install python3-pip
 ```
 
 #### 2. Kaggle

@@ -30,7 +30,7 @@ $ pip3 install --user kaggle
 #### 4. check
 제대로 설치되었는지 확인해본다.
 ```sh
-$ kaggle dataset -h
+$ kaggle datasets -h
 ```
 
 #### 4-1. troubleshooting
@@ -38,7 +38,7 @@ $ kaggle dataset -h
 ```sh
 $ sudo vim ~/.profile
 
-PATH=$PATH:$HOME.local/bin/kaggle
+PATH=$PATH:$HOME/.local/bin/kaggle
 ```
 
 #### 5. Download csv

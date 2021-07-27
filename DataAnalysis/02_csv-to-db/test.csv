@@ -1,0 +1,8 @@
+event_time,event_type,product_id,category_id,category_code,brand,price,user_id,user_session
+2019-11-01 00:00:00 UTC,view,1003461,2.05301E+18,electronics.smartphone,xiaomi,489.07,520088904,4d3b30da-a5e4-49df-b1a8-ba5943f1dd33
+2019-11-01 00:00:00 UTC,view,5000088,2.05301E+18,appliances.sewing_machine,janome,293.65,530496790,8e5f4f83-366c-4f70-860e-ca7417414283
+2019-11-01 00:00:01 UTC,view,17302664,2.05301E+18,,creed,28.31,561587266,755422e7-9040-477b-9bd2-6a6e8fd97387
+2019-11-01 00:00:01 UTC,view,3601530,2.05301E+18,appliances.kitchen.washer,lg,712.87,518085591,3bfb58cd-7892-48cc-8020-2f17e6de6e7f
+2019-11-01 00:00:01 UTC,view,1004775,2.05301E+18,electronics.smartphone,xiaomi,183.27,558856683,313628f1-68b8-460d-84f6-cec7a8796ef2
+2019-11-01 00:00:01 UTC,view,1306894,2.05301E+18,computers.notebook,hp,360.09,520772685,816a59f3-f5ae-4ccd-9b23-82aa8c23d33c
+2019-11-01 00:00:01 UTC,view,1306421,2.05301E+18,computers.notebook,hp,514.56,514028527,df8184cc-3694-4549-8c8c-6b5171877376

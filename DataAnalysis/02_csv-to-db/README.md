@@ -12,6 +12,8 @@ conn.commit()
 
 f = open('test.csv','r')
 csvReader = csv.reader(f)
+# skip header
+next(csvReader)
 
 for row in csvReader:
     event_time = (row[0])
@@ -36,9 +38,9 @@ conn.close()
 ```mysql
 CREATE TABLE orders  (
     id          bigint not null auto_increment,
-    time        varchar(255) not null,
+    time        varchar(255),
     category    varchar(255),
-    price       varchar(255),
+    price       double,
     user_id     varchar(255),
     primary key (id)
 ) engine = InnoDB;

@@ -6,23 +6,41 @@ conn = pymysql.connect(host='192.168.56.100', port=3306, user='root', password='
 curs = conn.cursor()
 conn.commit()
 
-f = open('test.csv','r')
+f = open('C:/Users/LGCNS/Downloads/2019-Nov.csv','r')
 csvReader = csv.reader(f)
+# header skip
+next(csvReader)
 
-for row in csvReader:
-    event_time = (row[0])
-    category_code = (row[4])
-    price = (row[6])
-    user_id = (row[7])
 
-    print(event_time, category_code, price, user_id)
+for cnt, row in enumerate(csvReader):
+  event_time = (row[0])
+  product_id = (row[2])
+  category_id = (row[3])
+  category_code = (row[4])
+  brand = (row[5])
+  price = (row[6])
+  user_id = (row[7])
 
-    sql = """insert into orders (time, category, price, user_id) values (%s, %s, %s, %s)"""
-    curs.execute(sql, (event_time, category_code, price, user_id))
+  sql = """insert into orders (time, product_id, category_id, category_code, brand, price, user_id) values (%s, %s, %s, %s, %s, %s, %s)"""
+  curs.execute(sql, (event_time, product_id, category_id, category_code, brand, price, user_id))
+  if cnt % 50000 == 0:
+    print(cnt)
+    conn.commit()
 
 #db의 변화 저장
 conn.commit()
-
 f.close()
-
 conn.close()
+
+# CREATE TABLE orders  (
+#     id            bigint not null auto_increment,
+#     time          varchar(255),
+#     product_id    varchar(255),
+#     category_id   bigint,
+#     category_code varchar(255),
+#     brand         varchar(255),
+#     price         double,
+#     user_id       varchar(255),
+#     primary key (id)
+# ) engine = InnoDB;
+

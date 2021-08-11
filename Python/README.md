@@ -58,3 +58,22 @@
 ```py
 map(적용시킬 함수, 적용할 요소)
 ```
+
+## Unpacking
+```py
+def sum(a, b, c):
+    return a + b + c
+
+numbers = [1, 2, 3]
+sum(numbers) # error
+
+print(sum(*numbers)) # 출력 : 6
+```
+
+## Transpose
+행, 열 바꾸기
+```py
+>>> lst = [[1,2,3],[4,5,6],[7,8,9]]
+>> [list(x) for x in zip(*lst)]
+[[1, 4, 7], [2, 5, 8], [3, 6, 9]]
+```
